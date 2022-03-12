@@ -11,11 +11,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from sensor_data import SensorData
-from gesture import GestureRecognizer
+import finger
 
 if __name__ == "__main__":
     if len(sys.argv) <= 1:
-        print("usage: python3 vix.py <filepath of data>")
+        print("usage: python3 viz.py <filepath of data>")
         sys.exit(-1)
 
     data = SensorData(sys.argv[1])
@@ -24,9 +24,9 @@ if __name__ == "__main__":
     y = np.arange(10)
 
     for x in xs:
-        vals, idxs = GestureRecognizer.identify(x)
-        for i in idxs[0]:
-            plt.plot(x[i], i, "sr")
+        vals = finger.detect(x)
+        for val in vals:
+            plt.plot(val[0], val[1], "sr")
         plt.scatter(x, y)
         plt.gca().set_xlim(left=0, right=275)
         plt.show()
