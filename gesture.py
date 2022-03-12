@@ -25,43 +25,45 @@
 from scipy.signal import argrelmin
 import numpy as np
 
+class GestureRecognizer:
+    @classmethod
+    def identify(cls, sensors):
+        npsensors = np.array(sensors)
+        min_idxs = argrelmin(npsensors)
+        values = []
+        for mini in min_idxs[0]:
+            values.append((npsensors[mini], mini))
+        return values, min_idxs
 
-def identify(sensors):
-    npsensors = np.array(sensors)
-    minimums = argrelmin(npsensors)
-    values = []
-    for mini in minimums[0]:
-        values.append((npsensors[mini], mini))
-    return values
-
-
-def classify(sensor1, sensor2):
-    fingers1 = identify(sensor1)
-    fingers2 = identify(sensor2)
-    gesture = ""
-    twoFingers = []
-    # this is a weak case to distinguish between rotate and zoom. two data points for zoom indicate two fingers, so the relative minimum will return the same number. need to define threshold for closeness.
-    if (len(fingers1) == 1) and (len(fingers2) == 1):
-        if(fingers1[0] < fingers2[0]):
-            gesture = "rotateLeft"
-        elif (fingers1[0] > fingers2[0]):
-            gesture = "rotateRight"
+    @classmethod
+    def classify(cls, sensor1, sensor2):
+        fingers1, _ = cls.identify(sensor1)
+        fingers2, _ = cls.identify(sensor2)
+        gesture = ""
+        twoFingers = []
+        # this is a weak case to distinguish between rotate and zoom. two data points for zoom indicate
+        # two fingers, so the relative minimum will return the same number. need to define threshold for closeness.
+        if (len(fingers1) == 1) and (len(fingers2) == 1):
+            if(fingers1[0] < fingers2[0]):
+                gesture = "rotateLeft"
+            elif (fingers1[0] > fingers2[0]):
+                gesture = "rotateRight"
+            else:
+                gesture = "noGesture"
         else:
-            gesture = "noGesture"
-    else:
-        if (len(fingers1) == 2) and (len(fingers2) == 1):
-            gesture = "zoomOut"
-        elif (len(fingers2) == 2) and (len(fingers1) == 1):
-            gesture = "zoomIn"
-        else:
-            gesture = "noGesture"
-        # didn't account for two finger identification
-        '''
-        if ((fingers2[0] < fingers1[0]) and (fingers2[1] < fingers1[1]) and (fingers1[0] < fingers2[0]) and (fingers1[1] < fingers2[1])):
-            gesture = "zoomIn"
-        elif ((fingers1[0] < fingers2[0]) and (fingers1[1] < fingers2[1]) and (fingers2[0] < fingers1[0]) and (fingers2[1] < fingers1[1])):
-            gesture = "zoomOut"
-        else:
-            gesture = "noGesture"
-        '''
-    return (gesture, fingers1, fingers2)
+            if (len(fingers1) == 2) and (len(fingers2) == 1):
+                gesture = "zoomOut"
+            elif (len(fingers2) == 2) and (len(fingers1) == 1):
+                gesture = "zoomIn"
+            else:
+                gesture = "noGesture"
+            # didn't account for two finger identification
+            '''
+            if ((fingers2[0] < fingers1[0]) and (fingers2[1] < fingers1[1]) and (fingers1[0] < fingers2[0]) and (fingers1[1] < fingers2[1])):
+                gesture = "zoomIn"
+            elif ((fingers1[0] < fingers2[0]) and (fingers1[1] < fingers2[1]) and (fingers2[0] < fingers1[0]) and (fingers2[1] < fingers1[1])):
+                gesture = "zoomOut"
+            else:
+                gesture = "noGesture"
+            '''
+        return (gesture, fingers1, fingers2)
