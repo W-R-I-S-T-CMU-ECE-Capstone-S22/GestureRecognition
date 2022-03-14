@@ -1,5 +1,6 @@
 from re import S
 from gesture import classify, identify
+import gesture
 
 
 rotatesample1 = [149, 125, 118, 102, 108, 101, 101, 97, 109, 115]
@@ -29,4 +30,12 @@ samplezoomout2 = [255, 255, 255, 255, 8, 7, 255, 255, 255, 255]
 
 samplezoomin1 = [255, 255, 255, 255, 8, 7, 255, 255, 255, 255]
 samplezoomin2 = [255, 255, 10, 255, 255, 255, 255, 100, 255, 255]
+<<<<<<< HEAD
+'''
+
+'''
+print(gesture.classify(samplerotateright1, samplerotateright2))
+print(gesture.classify(samplerotateleft1, samplerotateleft2))
+print(gesture.classify(samplezoomout1, samplezoomout2))
+print(gesture.classify(samplezoomin1, samplezoomin2))
 '''

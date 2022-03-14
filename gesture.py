@@ -20,11 +20,10 @@
 # zoom out: inputa1[0] < inputa2[0] && inputa1[1] < inputa2[1] && inputb2[0] < inputb1[0] && inputb2[1] < inputb1[1]
 #
 #
-# https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.argrelmin.html
 
-from scipy.signal import argrelmin
 import numpy as np
 import math
+import finger
 
 
 def identify(sensors):
@@ -40,11 +39,14 @@ def identify(sensors):
 
 
 def classify(sensor1, sensor2):
+    #fingers1 = finger.detect(sensor1)
+    #fingers2 = finger.detect(sensor2)
     fingers1 = identify(sensor1)
     fingers2 = identify(sensor2)
     gesture = ""
     twoFingers = []
-    # this is a weak case to distinguish between rotate and zoom. two data points for zoom indicate two fingers, so the relative minimum will return the same number. need to define threshold for closeness.
+    # this is a weak case to distinguish between rotate and zoom. two data points for zoom indicate
+    # two fingers, so the relative minimum will return the same number. need to define threshold for closeness.
     if (len(fingers1) == 1) and (len(fingers2) == 1):
         if(fingers1[0] < fingers2[0]):
             gesture = "rotateLeft"
