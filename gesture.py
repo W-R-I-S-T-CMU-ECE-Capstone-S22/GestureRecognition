@@ -24,15 +24,19 @@
 
 from scipy.signal import argrelmin
 import numpy as np
+import math
 
 
 def identify(sensors):
-    npsensors = np.array(sensors)
-    minimums = argrelmin(npsensors)
-    values = []
-    for mini in minimums[0]:
-        values.append((npsensors[mini], mini))
-    return values
+    first_min = min(sensors)
+    first_index = sensors.index(first_min)
+    second_min = sorted(set(sensors))[1]
+    second_index = sensors.index(second_min)
+    minimums = []
+    minimums.append((first_min, first_index))
+    if (abs(first_index-second_index) > 2):
+        minimums.append((second_min, second_index))
+    return minimums
 
 
 def classify(sensor1, sensor2):
