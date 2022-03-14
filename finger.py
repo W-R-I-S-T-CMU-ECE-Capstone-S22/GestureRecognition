@@ -6,12 +6,21 @@ from scipy.signal import argrelmin
 
 
 def detect(sensor_data):
-    #sensor_data = np.append(sensor_data, 255)
-    #sensor_data = np.append(255, sensor_data)
-    min_idxs = argrelmin(sensor_data)
+    mod_sensors = []
+    for sensor in sensor_data:
+        if(sensor < 200):
+            mod_sensors.append(sensor)
+
+    # bad way to append 255 to the first and last values of the array
+    mod_sensors = np.array(mod_sensors)
+    mod_sensors = np.append(mod_sensors, 255)
+    mod_sensors = np.append(255, mod_sensors)
+
+    min_idxs = argrelmin(np.array(mod_sensors))
     values = []
     for mini in min_idxs[0]:
-        values.append((sensor_data[mini], mini))
+        val = np.where(sensor_data == mod_sensors[mini])[0]
+        values.append((sensor_data[val], val))
     return values
 
 

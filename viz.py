@@ -21,13 +21,14 @@ if __name__ == "__main__":
     data = SensorData(sys.argv[1])
 
     xs = data.raw
-    y = np.arange(12)
+    y = np.arange(10)
 
     for x in xs:
-        x = np.append(x, 255)
-        x = np.append(255, x)
+        #x = np.append(x, 255)
+        #x = np.append(255, x)
         vals = finger.detect(x)
         for val in vals:
+            print(val[0], val[1])
             plt.plot(val[0], val[1], "sr")
         plt.scatter(x, y)
         plt.gca().set_xlim(left=0, right=275)
