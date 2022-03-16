@@ -19,7 +19,6 @@
 # where inputa1, inputa2, inputb1, and inputb2 are less than x
 # zoom out: inputa1[0] < inputa2[0] && inputa1[1] < inputa2[1] && inputb2[0] < inputb1[0] && inputb2[1] < inputb1[1]
 #
-#
 
 import numpy as np
 import math

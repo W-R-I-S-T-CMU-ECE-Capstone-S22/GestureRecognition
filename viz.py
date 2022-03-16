@@ -24,11 +24,12 @@ if __name__ == "__main__":
     y = np.arange(10)
 
     for x in xs:
-        #x = np.append(x, 255)
-        #x = np.append(255, x)
+        popt1, popt2 = finger.fit(x)
         vals = finger.detect(x)
         for val in vals:
             plt.plot(val[0], val[1], "sr")
+        plt.plot(finger.func_quad(y, *popt1), y, "orange")
+        plt.plot(finger.func_double(y, *popt2), y, "green")
         plt.scatter(x, y)
         plt.gca().set_xlim(left=0, right=275)
         plt.show()

@@ -2,36 +2,30 @@
 See: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.argrelmin.html
 """
 import numpy as np
-from scipy.signal import argrelmin
+import scipy.signal
+import scipy.optimize
+import matplotlib.pyplot as plt
+
+
+def func_quad(x, a, b, c, d, e):
+    return a*x**4 + b*x**3 + c*x**2 + d*x + e
+
+
+def func_double(x, a, b, c):
+    return a*x**2 + b*x + c
+
+
+def fit(sensor_data):
+    ydata = np.array(sensor_data)
+    xdata = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    popt1, _ = scipy.optimize.curve_fit(func_quad, xdata, ydata)
+    popt2, _ = scipy.optimize.curve_fit(func_double, xdata, ydata)
+    return popt1, popt2
 
 
 def detect(sensor_data):
-    mod_sensors = []
-    for sensor in sensor_data:
-        if(sensor < 200):
-            mod_sensors.append(sensor)
-
-    # bad way to append 255 to the first and last values of the array
-    mod_sensors = np.array(mod_sensors)
-    mod_sensors = np.append(mod_sensors, 255)
-    mod_sensors = np.append(255, mod_sensors)
-
-    min_idxs = argrelmin(np.array(mod_sensors))
+    min_idxs = scipy.signal.argrelmax(np.array(sensor_data), order=2)
     values = []
     for mini in min_idxs[0]:
-        val = np.where(sensor_data == mod_sensors[mini])[0]
-        values.append((sensor_data[val], val))
+        values.append((sensor_data[mini], mini))
     return values
-
-
-# faulty finger detection algorithm
-def faulty_detect(sensors):
-    first_min = min(sensors)
-    first_index = sensors.index(first_min)
-    second_min = sorted(set(sensors))[1]
-    second_index = sensors.index(second_min)
-    minimums = []
-    minimums.append((first_min, first_index))
-    if (abs(first_index-second_index) > 2):
-        minimums.append((second_min, second_index))
-    return minimums
