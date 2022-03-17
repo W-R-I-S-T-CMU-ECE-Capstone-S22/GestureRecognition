@@ -7,20 +7,45 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 
 
-def func_quad(x, a, b, c, d, e):
-    return a*x**4 + b*x**3 + c*x**2 + d*x + e
+def remove_bad_data(sensor_data):
+    idxs = np.where(sensor_data >= 175)
+    new_data = np.delete(sensor_data, idxs)
+    return new_data, idxs
 
 
-def func_double(x, a, b, c):
-    return a*x**2 + b*x + c
+# 4th degree polynomial
+def quatric(x, c, d, e, f, g):
+    return c*x**4 + d*x**3 + e*x**2 + f*x + g
 
 
 def fit(sensor_data):
+    sensor_data, rmved_idxs = remove_bad_data(sensor_data)
     ydata = np.array(sensor_data)
-    xdata = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-    popt1, _ = scipy.optimize.curve_fit(func_quad, xdata, ydata)
-    popt2, _ = scipy.optimize.curve_fit(func_double, xdata, ydata)
-    return popt1, popt2
+    sensor_nums = np.arange(10)
+    xdata = np.delete(sensor_nums, rmved_idxs)
+
+    popt = None
+    rmse = np.inf
+    peaks_min = None
+    peaks_max = None
+    if xdata.size > 3:
+        # try to fit a 4th degree poly to data
+        popt = np.polyfit(xdata, ydata, 4)
+        ypred = quatric(xdata, *popt)
+        # find rms error
+        rmse = np.sqrt(np.square(ydata - ypred).mean())
+
+        # find approximate fitted curve and fins rel min and rel max
+        fitted = quatric(sensor_nums, *popt)
+        peaks_min = scipy.signal.argrelmin(fitted)[0]
+        peaks_max = scipy.signal.argrelmax(fitted)[0]
+
+        # delete values at the "edges"; there cannot be a pinch at
+        # the edges
+        peaks_max = np.delete(peaks_max, np.where(peaks_max == fitted.size-2))
+        peaks_max = np.delete(peaks_max, np.where(peaks_max == 1))
+
+    return popt, rmse, peaks_min, peaks_max
 
 
 def detect(sensor_data):

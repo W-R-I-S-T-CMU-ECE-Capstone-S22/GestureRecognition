@@ -24,12 +24,25 @@ if __name__ == "__main__":
     y = np.arange(10)
 
     for x in xs:
-        popt1, popt2 = finger.fit(x)
-        vals = finger.detect(x)
-        for val in vals:
-            plt.plot(val[0], val[1], "sr")
-        plt.plot(finger.func_quad(y, *popt1), y, "orange")
-        plt.plot(finger.func_double(y, *popt2), y, "green")
+        popt, rmse, peaks_min, peaks_max = finger.fit(x)
+
+        # print('err:', rmse)
+        if popt is not None and rmse < 15.0:
+            f = finger.quatric(y, *popt)
+            plt.plot(f, y, "orange")
+
+            for i in peaks_min:
+                plt.plot(f[i], i, "sr")
+            for i in peaks_max:
+                plt.plot(f[i], i, "sg")
+
+            if len(peaks_max) == 1:
+                plt.title("pinch")
+            elif len(peaks_max) == 0:
+                plt.title("swipe")
+        else:
+            plt.title("none")
+
         plt.scatter(x, y)
         plt.gca().set_xlim(left=0, right=275)
         plt.show()
