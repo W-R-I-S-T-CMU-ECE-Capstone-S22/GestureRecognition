@@ -25,36 +25,6 @@ import math
 import finger
 
 
-def classify(sensor1, sensor2):
-    fingers1 = finger.detect(sensor1)
-    fingers2 = finger.detect(sensor2)
-    #fingers1 = identify(sensor1)
-    #fingers2 = identify(sensor2)
-    gesture = ""
-    twoFingers = []
-    # this is a weak case to distinguish between rotate and zoom. two data points for zoom indicate
-    # two fingers, so the relative minimum will return the same number. need to define threshold for closeness.
-    if (len(fingers1) == 1) and (len(fingers2) == 1):
-        if(fingers1[0] < fingers2[0]):
-            gesture = "rotateLeft"
-        elif (fingers1[0] > fingers2[0]):
-            gesture = "rotateRight"
-        else:
-            gesture = "noGesture"
-    else:
-        if (len(fingers1) == 2) and (len(fingers2) == 1):
-            gesture = "zoomOut"
-        elif (len(fingers2) == 2) and (len(fingers1) == 1):
-            gesture = "zoomIn"
-        else:
-            gesture = "noGesture"
-        # didn't account for two finger identification
-        '''
-        if ((fingers2[0] < fingers1[0]) and (fingers2[1] < fingers1[1]) and (fingers1[0] < fingers2[0]) and (fingers1[1] < fingers2[1])):
-            gesture = "zoomIn"
-        elif ((fingers1[0] < fingers2[0]) and (fingers1[1] < fingers2[1]) and (fingers2[0] < fingers1[0]) and (fingers2[1] < fingers1[1])):
-            gesture = "zoomOut"
-        else:
-            gesture = "noGesture"
-        '''
-    return (gesture, fingers1, fingers2)
+def classify(sensor_data):
+    popt, rmse, peaks_min, peaks_max = finger.fit(x)
+

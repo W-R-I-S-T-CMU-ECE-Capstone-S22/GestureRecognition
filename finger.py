@@ -6,6 +6,7 @@ import scipy.signal
 import scipy.optimize
 import matplotlib.pyplot as plt
 
+from constants import *
 
 def remove_bad_data(sensor_data):
     idxs = np.where(sensor_data >= 175)
@@ -21,8 +22,8 @@ def quatric(x, c, d, e, f, g):
 def fit(sensor_data):
     sensor_data, rmved_idxs = remove_bad_data(sensor_data)
     ydata = np.array(sensor_data)
-    sensor_nums = np.arange(10)
-    xdata = np.delete(sensor_nums, rmved_idxs)
+    sensors = np.arange(10) * SENSOR_DIST
+    xdata = np.delete(sensors, rmved_idxs)
 
     popt = None
     rmse = np.inf
@@ -36,7 +37,7 @@ def fit(sensor_data):
         rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
-        fitted = quatric(sensor_nums, *popt)
+        fitted = quatric(sensors, *popt)
         peaks_min = scipy.signal.argrelmin(fitted)[0]
         peaks_max = scipy.signal.argrelmax(fitted)[0]
 
@@ -49,8 +50,27 @@ def fit(sensor_data):
 
 
 def detect(sensor_data):
-    min_idxs = scipy.signal.argrelmax(np.array(sensor_data), order=2)
-    values = []
-    for mini in min_idxs[0]:
-        values.append((sensor_data[mini], mini))
-    return values
+    popt, rmse, peaks_min, peaks_max = fit(sensor_data)
+
+    possible_gesture = "none"
+    fingers = []
+    if popt is not None and rmse < 15.0:
+        sensors = np.arange(10) * SENSOR_DIST
+        f = quatric(sensors, *popt)
+
+        num_fingers = 0
+        if len(peaks_max) == 0:
+            possible_gesture = "swipe"
+            num_fingers = 1
+        elif len(peaks_max) == 1:
+            possible_gesture = "pinch"
+            num_fingers = 2
+
+        if num_fingers != 0 and peaks_min.size >= num_fingers:
+            # find lowest num_fingers amount of min_peaks
+            min_idxs = f[peaks_min].argsort()[:num_fingers]
+            finger_idxs = peaks_min[min_idxs]
+            for idx in finger_idxs:
+                fingers += [(f[idx], sensors[idx])]
+
+    return possible_gesture, fingers

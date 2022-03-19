@@ -1,32 +1,19 @@
-from re import S
+import sys
+import numpy as np
+
+import finger
 import gesture
 
-rotatesample1 = [149, 125, 118, 102, 108, 101, 101, 97, 109, 115]
-rotatesample2 = [255, 154, 150, 140, 145, 255, 139, 132, 140, 133]
 
-zoomsample1 = [130, 122, 116, 122, 135, 138, 138, 125, 128, 130]
-zoomsample2 = [115, 113, 119, 124, 137, 138, 136, 121, 122, 111]
+if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        print("usage: python3 test.py <filepath of data>")
+        sys.exit(-1)
 
-print(gesture.classify(zoomsample1, zoomsample2))
+    data = SensorData(sys.argv[1])
 
-'''
-samplerotateright1 = [255, 255, 255, 255, 10, 255, 255, 255, 255, 255]
-samplerotateright2 = [255, 255, 255, 255, 8, 255, 255, 255, 255, 255]
+    xs = data.raw
+    y = np.arange(10)
 
-samplerotateleft1 = [255, 255, 255, 255, 8, 255, 255, 255, 255, 255]
-samplerotateleft2 = [255, 255, 255, 255, 10, 255, 255, 255, 255, 255]
+    for x in xs:
 
-samplezoomout1 = [255, 255, 10, 255, 255, 255, 255, 100, 255, 255]
-samplezoomout2 = [255, 255, 255, 255, 8, 7, 255, 255, 255, 255]
-
-samplezoomin1 = [255, 255, 255, 255, 8, 7, 255, 255, 255, 255]
-samplezoomin2 = [255, 255, 10, 255, 255, 255, 255, 100, 255, 255]
-<<<<<<< HEAD
-'''
-
-'''
-print(gesture.classify(samplerotateright1, samplerotateright2))
-print(gesture.classify(samplerotateleft1, samplerotateleft2))
-print(gesture.classify(samplezoomout1, samplezoomout2))
-print(gesture.classify(samplezoomin1, samplezoomin2))
-'''

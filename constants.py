@@ -1,0 +1,1 @@
+SENSOR_DIST = 5.08
