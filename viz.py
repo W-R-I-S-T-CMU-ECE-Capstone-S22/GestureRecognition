@@ -2,15 +2,13 @@
 Visualizes sensor data and predicted finger position.
 
 Run code and continually press x on plots.
-
-Predicted fingers will show up as red squares.
 """
 import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from sensor_data import SensorData
+from sensor_data import SensorData, SensorDatasFromFile
 import finger
 
 from constants import *
@@ -20,10 +18,10 @@ if __name__ == "__main__":
         print("usage: python3 viz.py <filepath of data>")
         sys.exit(-1)
 
-    data = SensorData(sys.argv[1])
+    data = SensorDatasFromFile(sys.argv[1])
 
     xs = data.raw
-    y = np.arange(10) * SENSOR_DIST
+    y = SensorData.get_sensors()
 
     for x in xs:
         popt, rmse, peaks_min, peaks_max = finger.fit(x)
@@ -37,6 +35,9 @@ if __name__ == "__main__":
             for i in peaks_max:
                 plt.plot(f[i], i*SENSOR_DIST, "sg")
 
+            for i in peaks_min:
+                plt.plot(f[i], i*SENSOR_DIST, "s", color="orange")
+
         for finger_x, finger_y in fingers:
             plt.plot(finger_x, finger_y, "<r")
 
@@ -46,3 +47,4 @@ if __name__ == "__main__":
         plt.ylabel("sensors (mm)")
         plt.gca().set_xlim(left=0, right=275)
         plt.show()
+

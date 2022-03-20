@@ -25,6 +25,6 @@ import math
 import finger
 
 
-def classify(sensor_data):
-    popt, rmse, peaks_min, peaks_max = finger.fit(x)
+def classify(gesture, fingers):
+    return gesture
 

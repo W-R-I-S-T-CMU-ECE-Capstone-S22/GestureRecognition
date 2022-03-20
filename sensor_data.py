@@ -3,8 +3,19 @@ Wrapper for sensor data to be read from a file.
 """
 
 import numpy as np
+from constants import *
 
 class SensorData:
+    def __init__(self, data):
+        data = list(data)
+        self.timestamp = int.from_bytes(bytes(data[:-NUM_SENSORS]), "little")
+        self.raw = data[-NUM_SENSORS:]
+
+    @classmethod
+    def get_sensors(cls):
+        return np.arange(NUM_SENSORS) * SENSOR_DIST
+
+class SensorDatasFromFile:
     def __init__(self, filename):
         self.timestamps = []
         self.raw = []

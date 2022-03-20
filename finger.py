@@ -1,5 +1,4 @@
 """
-See: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.argrelmin.html
 """
 import numpy as np
 import scipy.signal
@@ -7,11 +6,36 @@ import scipy.optimize
 import matplotlib.pyplot as plt
 
 from constants import *
+from sensor_data import SensorData
+
 
 def remove_bad_data(sensor_data):
-    idxs = np.where(sensor_data >= 175)
+    idxs = np.where(sensor_data >= DIST_THRES)
     new_data = np.delete(sensor_data, idxs)
     return new_data, idxs
+
+
+def find_finger_y(finger_idx, sensor_data):
+    finger_y = finger_idx
+
+    center_val = float(sensor_data[finger_idx])
+    ws = []
+    # grab the 4 indices surrounding the finger_idx:
+    # [finger_idx - 2, finger_idx - 1, finger_idx, finger_idx + 1, finger_idx + 2]
+    idxs = np.arange(-2,3) + finger_idx
+    for i in idxs:
+        if 0 <= i < sensor_data.size:
+            val = float(sensor_data[i])
+            # weight is 1/(|xi - x| + 5)
+            # kinda averaging it, but with a weighting
+            ws += [1.0 / (np.abs(val - center_val) + 5.0)]
+        else:
+            ws += [0.0]
+
+    ws = np.array(ws)
+    finger_y = SENSOR_DIST * np.sum(ws * idxs) / np.sum(ws)
+
+    return finger_y
 
 
 # 4th degree polynomial
@@ -22,7 +46,7 @@ def quatric(x, c, d, e, f, g):
 def fit(sensor_data):
     sensor_data, rmved_idxs = remove_bad_data(sensor_data)
     ydata = np.array(sensor_data)
-    sensors = np.arange(10) * SENSOR_DIST
+    sensors = SensorData.get_sensors()
     xdata = np.delete(sensors, rmved_idxs)
 
     popt = None
@@ -55,7 +79,7 @@ def detect(sensor_data):
     possible_gesture = "none"
     fingers = []
     if popt is not None and rmse < 15.0:
-        sensors = np.arange(10) * SENSOR_DIST
+        sensors = SensorData.get_sensors()
         f = quatric(sensors, *popt)
 
         num_fingers = 0
@@ -71,6 +95,7 @@ def detect(sensor_data):
             min_idxs = f[peaks_min].argsort()[:num_fingers]
             finger_idxs = peaks_min[min_idxs]
             for idx in finger_idxs:
-                fingers += [(f[idx], sensors[idx])]
+                fingers += [(f[idx], find_finger_y(idx, sensor_data))]
 
     return possible_gesture, fingers
+
