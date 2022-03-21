@@ -47,4 +47,3 @@ if __name__ == "__main__":
         plt.ylabel("sensors (mm)")
         plt.gca().set_xlim(left=0, right=275)
         plt.show()
-

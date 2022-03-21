@@ -22,7 +22,7 @@ def find_finger_y(finger_idx, sensor_data):
     ws = []
     # grab the 4 indices surrounding the finger_idx:
     # [finger_idx - 2, finger_idx - 1, finger_idx, finger_idx + 1, finger_idx + 2]
-    idxs = np.arange(-2,3) + finger_idx
+    idxs = np.arange(-2, 3) + finger_idx
     for i in idxs:
         if 0 <= i < sensor_data.size:
             val = float(sensor_data[i])
@@ -70,6 +70,9 @@ def fit(sensor_data):
         peaks_max = np.delete(peaks_max, np.where(peaks_max == fitted.size-2))
         peaks_max = np.delete(peaks_max, np.where(peaks_max == 1))
 
+    # max of points instead of curve
+    # peaks_max = scipy.signal.argrelmax(sensor_data, order=4)[0]
+
     return popt, rmse, peaks_min, peaks_max
 
 
@@ -98,4 +101,3 @@ def detect(sensor_data):
                 fingers += [(f[idx], find_finger_y(idx, sensor_data))]
 
     return possible_gesture, fingers
-

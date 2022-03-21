@@ -23,6 +23,21 @@ if __name__ == "__main__":
 
     correct = 0.0
     total = 0.0
+
+    multiple_data = []
+    n = 3
+
+    print("new detection")
+    for x in xs:
+        prediction, _ = finger.detect(x)
+        print("data prediction: ", prediction)
+        multiple_data.append(x)
+        if len(multiple_data) > n:
+            pred = gesture.classify(multiple_data)
+            print(pred)
+            multiple_data = []
+
+    print("old detection")
     for x in xs:
         if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
             continue
@@ -34,4 +49,3 @@ if __name__ == "__main__":
         total += 1
 
     print("Percent correct:", correct/total * 100, "%")
-
