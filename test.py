@@ -27,8 +27,10 @@ if __name__ == "__main__":
     multiple_data = []
     n = 3
 
-    print("new detection")
+    print("-- new detection --")
     for x in xs:
+        if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
+            continue
         prediction, _ = finger.detect(x)
         print("data prediction: ", prediction)
         multiple_data.append(x)
@@ -37,7 +39,16 @@ if __name__ == "__main__":
             print(pred)
             multiple_data = []
 
-    print("old detection")
+            if pred in correct_gesture:
+                correct += 1
+
+            total += 1
+
+    new_det_accuracy = correct/total * 100
+
+    correct = 0.0
+    total = 0.0
+    print("-- old detection --")
     for x in xs:
         if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
             continue
@@ -48,4 +59,5 @@ if __name__ == "__main__":
 
         total += 1
 
-    print("Percent correct:", correct/total * 100, "%")
+    print("Percent correct (new):", new_det_accuracy, "%")
+    print("Percent correct (old):", correct/total * 100, "%")

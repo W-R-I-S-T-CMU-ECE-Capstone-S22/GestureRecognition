@@ -23,7 +23,7 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected!")
         client.subscribe(DATA_TOPIC)
-        # client.subscribe(BATT_TOPIC)
+        client.subscribe(BATT_TOPIC)
 
 def on_disconnect(client, userdata, rc):
     if rc == 0:
@@ -64,9 +64,8 @@ client.loop_start()
 
 while (1):
     try:
-        pass
-        # time.sleep(10)
-        # client.publish(BATT_TOPIC_ASK, 0)
+        time.sleep(10)
+        client.publish(BATT_TOPIC_ASK, 0)
     except KeyboardInterrupt:
         client.disconnect()
         time.sleep(0.1)
