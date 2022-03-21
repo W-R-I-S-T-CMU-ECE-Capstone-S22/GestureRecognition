@@ -1,5 +1,6 @@
 import sys
 import time
+import json
 import random
 import paho.mqtt.client as mqtt
 
@@ -14,6 +15,7 @@ from constants import *
 DATA_TOPIC = "wrist/data/sensors"
 BATT_TOPIC = "wrist/batt/sensors"
 BATT_TOPIC_ASK = "wrist/batt/ask"
+GESTURE_TOPIC = "wrist/data/gestures"
 
 NUM_SENSORS = 10
 
@@ -21,7 +23,7 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected!")
         client.subscribe(DATA_TOPIC)
-        client.subscribe(BATT_TOPIC)
+        # client.subscribe(BATT_TOPIC)
 
 def on_disconnect(client, userdata, rc):
     if rc == 0:
@@ -34,7 +36,17 @@ def on_message(client, userdata, msg):
         sensor_data = SensorData(data)
 
         pred_gesture, fingers = finger.detect(sensor_data.raw)
-        print(pred_gesture)
+        if pred_gesture == "pinch": return
+
+        webapp_data = {}
+        webapp_data["gesture"] = pred_gesture
+        webapp_data["x_coord"] = [x for x,y in fingers]
+        webapp_data["y_coord"] = [y for x,y in fingers]
+        webapp_data["timestamp"] = time.time()
+        webapp_data = json.dumps(webapp_data)
+
+        print(webapp_data)
+        client.publish(GESTURE_TOPIC, webapp_data)
 
     elif msg.topic == BATT_TOPIC:
         batt = BatteryInfo(data)
@@ -52,9 +64,11 @@ client.loop_start()
 
 while (1):
     try:
-        time.sleep(5)
-        client.publish(BATT_TOPIC_ASK, 0)
+        pass
+        # time.sleep(10)
+        # client.publish(BATT_TOPIC_ASK, 0)
     except KeyboardInterrupt:
         client.disconnect()
         time.sleep(0.1)
         break
+

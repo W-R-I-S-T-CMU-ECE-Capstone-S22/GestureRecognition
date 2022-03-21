@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 from constants import *
 from sensor_data import SensorData
 
+EXTRA_LEN = 2
+
 
 def remove_bad_data(sensor_data):
     idxs = np.where(sensor_data >= DIST_THRES)
@@ -55,20 +57,29 @@ def fit(sensor_data):
     peaks_max = None
     if xdata.size > 3:
         # try to fit a 4th degree poly to data
-        popt = np.polyfit(xdata, ydata, 4)
+        popt, residuals, rank, sing_vals, rcond = np.polyfit(xdata, ydata, 4, full=True)
         ypred = quatric(xdata, *popt)
         # find rms error
         rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
-        fitted = quatric(sensors, *popt)
+        # append extra predicted values beyond the 10 sensors in the front and back
+        mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS + EXTRA_LEN) * SENSOR_DIST
+        fitted = quatric(mod_sensors, *popt)
         peaks_min = scipy.signal.argrelmin(fitted)[0]
         peaks_max = scipy.signal.argrelmax(fitted)[0]
 
         # delete values at the "edges"; there cannot be a pinch at
         # the edges
-        peaks_max = np.delete(peaks_max, np.where(peaks_max == fitted.size-2))
-        peaks_max = np.delete(peaks_max, np.where(peaks_max == 1))
+        peaks_max = np.delete(peaks_max, np.where(peaks_max >= fitted.size-EXTRA_LEN-1))
+        peaks_max = np.delete(peaks_max, np.where(peaks_max <= EXTRA_LEN+1))
+
+        # adjust indices to original sensor values
+        peaks_min -= EXTRA_LEN
+        peaks_max -= EXTRA_LEN
+        # remove negative indices
+        peaks_min = np.delete(peaks_min, np.where(peaks_min < 0))
+        peaks_max = np.delete(peaks_max, np.where(peaks_max < 0))
 
     # max of points instead of curve
     # peaks_max = scipy.signal.argrelmax(sensor_data, order=4)[0]
