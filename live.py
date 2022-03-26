@@ -36,7 +36,6 @@ def on_message(client, userdata, msg):
         sensor_data = SensorData(data)
 
         pred_gesture, fingers = finger.detect(sensor_data.raw)
-        if pred_gesture == "pinch": return
 
         webapp_data = {}
         webapp_data["gesture"] = pred_gesture
