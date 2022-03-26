@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
         # print('err:', rmse)
         if popt is not None and rmse < 15.0:
-            f = finger.quatric(mod_y, *popt)
+            f = finger.quartic(mod_y, *popt)
             plt.plot(f, mod_y, "orange")
 
             for i in peaks_max:

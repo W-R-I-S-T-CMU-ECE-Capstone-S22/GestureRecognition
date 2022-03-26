@@ -41,8 +41,8 @@ def find_finger_y(finger_idx, sensor_data):
 
 
 # 4th degree polynomial
-def quatric(x, c, d, e, f, g):
-    return c*x**4 + d*x**3 + e*x**2 + f*x + g
+def quartic(x, a, b, c, d, e):
+    return a*x**4 + b*x**3 + c*x**2 + d*x + e
 
 
 def fit(sensor_data):
@@ -58,14 +58,14 @@ def fit(sensor_data):
     if xdata.size > 3:
         # try to fit a 4th degree poly to data
         popt, residuals, rank, sing_vals, rcond = np.polyfit(xdata, ydata, 4, full=True)
-        ypred = quatric(xdata, *popt)
+        ypred = quartic(xdata, *popt)
         # find rms error
         rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
         # append extra predicted values beyond the 10 sensors in the front and back
         mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS + EXTRA_LEN) * SENSOR_DIST
-        fitted = quatric(mod_sensors, *popt)
+        fitted = quartic(mod_sensors, *popt)
         peaks_min = scipy.signal.argrelmin(fitted)[0]
         peaks_max = scipy.signal.argrelmax(fitted)[0]
 
@@ -94,7 +94,7 @@ def detect(sensor_data):
     fingers = []
     if popt is not None and rmse < 15.0:
         sensors = SensorData.get_sensors()
-        f = quatric(sensors, *popt)
+        f = quartic(sensors, *popt)
 
         num_fingers = 0
         if len(peaks_max) == 0:
