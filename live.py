@@ -12,13 +12,6 @@ import finger
 
 from constants import *
 
-DATA_TOPIC = "wrist/data/sensors"
-BATT_TOPIC = "wrist/batt/sensors"
-BATT_TOPIC_ASK = "wrist/batt/ask"
-GESTURE_TOPIC = "wrist/data/gestures"
-
-NUM_SENSORS = 10
-
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected!")
