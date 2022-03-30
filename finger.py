@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from constants import *
 from sensor_data import SensorData
 
-EXTRA_LEN = 2
+EXTRA_LEN = 0
 
 
 def remove_bad_data(sensor_data):
@@ -41,8 +41,8 @@ def find_finger_y(finger_idx, sensor_data):
 
 
 # 4th degree polynomial
-def quartic(x, a, b, c, d, e):
-    return a*x**4 + b*x**3 + c*x**2 + d*x + e
+def quartic(x, a, b, c, d, e, f, g):
+    return a*x**6 + b*x**5 + c*x**4 + d*x**3 + e*x**2 + f*x**1 + g*x**0
 
 
 def fit(sensor_data):
@@ -57,21 +57,24 @@ def fit(sensor_data):
     peaks_max = None
     if xdata.size > 3:
         # try to fit a 4th degree poly to data
-        popt, residuals, rank, sing_vals, rcond = np.polyfit(xdata, ydata, 4, full=True)
+        popt, residuals, rank, sing_vals, rcond = np.polyfit(
+            xdata, ydata, 6, full=True)
         ypred = quartic(xdata, *popt)
         # find rms error
         rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
         # append extra predicted values beyond the 10 sensors in the front and back
-        mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS + EXTRA_LEN) * SENSOR_DIST
+        mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS +
+                                EXTRA_LEN) * SENSOR_DIST
         fitted = quartic(mod_sensors, *popt)
         peaks_min = scipy.signal.argrelmin(fitted)[0]
         peaks_max = scipy.signal.argrelmax(fitted)[0]
 
         # delete values at the "edges"; there cannot be a pinch at
         # the edges
-        peaks_max = np.delete(peaks_max, np.where(peaks_max >= fitted.size-EXTRA_LEN-1))
+        peaks_max = np.delete(peaks_max, np.where(
+            peaks_max >= fitted.size-EXTRA_LEN-1))
         peaks_max = np.delete(peaks_max, np.where(peaks_max <= EXTRA_LEN+1))
 
         # adjust indices to original sensor values
@@ -104,7 +107,13 @@ def detect(sensor_data):
             possible_gesture = "pinch"
             num_fingers = 2
 
-        if num_fingers != 0 and peaks_min.size >= num_fingers:
+        peakVerify = True
+
+        for peakmin in peaks_min:
+            if peakmin >= len(f):
+                peakVerify = False
+
+        if num_fingers != 0 and peaks_min.size >= num_fingers and peakVerify:
             # find lowest num_fingers amount of min_peaks
             min_idxs = f[peaks_min].argsort()[:num_fingers]
             finger_idxs = peaks_min[min_idxs]
