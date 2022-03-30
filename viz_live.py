@@ -6,6 +6,7 @@ import sys
 import time
 import json
 import random
+import pickle
 import paho.mqtt.client as mqtt
 
 from sensor_data import SensorData, BatteryInfo
@@ -22,7 +23,10 @@ scat = axs.scatter([],[])
 title = axs.text(1.0, 1.0, "")
 scat_fingers = axs.scatter([],[])
 
+clf = pickle.load(open(MODEL_NAME, "rb"))
+
 datas = []
+
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -43,15 +47,6 @@ def on_message(client, userdata, msg):
         datas.append(sensor_data)
 
 
-client = mqtt.Client("client" + str(random.randrange(100000, 999999)), clean_session=True)
-client.on_connect = on_connect
-client.on_disconnect = on_disconnect
-client.on_message = on_message
-
-client.connect("mqtt.eclipseprojects.io", 1883, 60)
-
-client.loop_start()
-
 def init():
     return scat, title, scat_fingers
 
@@ -65,6 +60,8 @@ def animate(i):
 
         pred_gesture, fingers = finger.detect(x)
         gest = gesture.classify1(fingers)
+
+        print(clf.predict([x]))
 
         title.set_text(f"Gesture={gest}")
 
@@ -83,6 +80,16 @@ def animate(i):
 
         client.publish(GESTURE_TOPIC, webapp_data)
     return scat, title, scat_fingers,
+
+
+client = mqtt.Client("client" + str(random.randrange(100000, 999999)), clean_session=True)
+client.on_connect = on_connect
+client.on_disconnect = on_disconnect
+client.on_message = on_message
+
+client.connect("mqtt.eclipseprojects.io", 1883, 60)
+
+client.loop_start()
 
 anim = FuncAnimation(fig, animate, init_func=init, interval=33, blit=True)
 

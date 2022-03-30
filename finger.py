@@ -1,5 +1,7 @@
 """
 """
+import time
+import pickle
 import numpy as np
 import scipy.signal
 import scipy.optimize
@@ -8,8 +10,10 @@ import matplotlib.pyplot as plt
 from constants import *
 from sensor_data import SensorData
 
+
 EXTRA_LEN = 1
 
+clf = pickle.load(open(MODEL_NAME, "rb"))
 
 def remove_bad_data(sensor_data):
     idxs = np.where(sensor_data >= DIST_THRES)

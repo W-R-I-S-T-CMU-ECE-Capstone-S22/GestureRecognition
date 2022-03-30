@@ -8,3 +8,4 @@ BATT_TOPIC = "wrist/batt/sensors"
 BATT_TOPIC_ASK = "wrist/batt/ask"
 GESTURE_TOPIC = "wrist/data/gestures"
 
+MODEL_NAME = "model.pkl"

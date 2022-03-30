@@ -4,6 +4,7 @@ Visualizes sensor data and predicted finger position.
 Run code and continually press x on plots.
 """
 import sys
+import pickle
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,6 +25,7 @@ if __name__ == "__main__":
     y = SensorData.get_sensors()
     mod_y = np.arange(-finger.EXTRA_LEN,NUM_SENSORS+finger.EXTRA_LEN) * SENSOR_DIST
 
+    clf = pickle.load(open(MODEL_NAME, "rb"))
     for x in xs:
         popt, rmse, peaks_min, peaks_max = finger.fit(x)
         gest, fingers = finger.detect(x)
@@ -45,6 +47,8 @@ if __name__ == "__main__":
         for finger_x, finger_y in fingers:
             plt.plot(finger_x, finger_y, "<r")
             plt.text(finger_x, finger_y, "finger")
+
+        print(clf.predict([x]))
 
         plt.scatter(x, y)
         plt.title(f"Gesture={gest}")
