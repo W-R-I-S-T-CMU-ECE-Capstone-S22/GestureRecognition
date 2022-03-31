@@ -5,12 +5,14 @@ Wrapper for sensor data to be read from a file.
 import numpy as np
 from constants import *
 
+
 class BatteryInfo:
     def __init__(self, data):
         timestamp, voltage, percentage = data.decode("utf-8").split(",")
         self.timestamp = int(timestamp)
         self.voltage = float(voltage)
         self.percentage = float(percentage)
+
 
 class SensorData:
     def __init__(self, data):
@@ -22,6 +24,7 @@ class SensorData:
     def get_sensors(cls):
         return np.arange(NUM_SENSORS) * SENSOR_DIST
 
+
 class SensorDatasFromFile:
     def __init__(self, filename):
         self.timestamps = []
@@ -32,7 +35,8 @@ class SensorDatasFromFile:
     def read_file(self, filename):
         f = open(filename, "r")
         for data in f.read().split("\n"):
-            if data == "": continue
+            if data == "":
+                continue
 
             timestamp_idx = data.index(", [")
             timestamp = float(data[:timestamp_idx])
@@ -41,4 +45,3 @@ class SensorDatasFromFile:
             raw_str = data[timestamp_idx:].strip(", ").strip("[").strip("]")
             raw = np.fromstring(raw_str, dtype=np.uint8, sep=", ")
             self.raw += [raw]
-

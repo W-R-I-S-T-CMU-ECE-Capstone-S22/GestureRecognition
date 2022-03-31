@@ -25,45 +25,59 @@ if __name__ == "__main__":
     total = 0.0
 
     multiple_data = []
+    n = 3
 
-    correctness = []
+    print("-- new new detection --")
+    for x in xs:
+        if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
+            continue
+        prediction, fingers = finger.detect(x)
+        pred = gesture.classify1(fingers)
+        print(pred, correct_gesture)
 
-    for n in range(2, 6):
+        if pred in correct_gesture:
+            correct += 1
 
-        print("-- new detection --")
-        for x in xs:
-            if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
-                continue
-            prediction, _ = finger.detect(x)
-            print("data prediction: ", prediction)
-            multiple_data.append(x)
-            if len(multiple_data) > n:
-                pred = gesture.classify(multiple_data)
-                print(pred)
-                multiple_data = []
+        total += 1
 
-                if pred in correct_gesture:
-                    correct += 1
+    new_new_det_accuracy = correct/total * 100
 
-                total += 1
+    correct = 0.0
+    total = 0.0
+    # print("-- new detection --")
+    for x in xs:
+        if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
+            continue
+        prediction, _ = finger.detect(x)
+        # print("data prediction: ", prediction)
+        multiple_data.append(x)
+        if len(multiple_data) > n:
+            pred = gesture.classify(multiple_data)
+            # print(pred)
+            multiple_data = []
 
-        new_det_accuracy = correct/total * 100
-
-        correct = 0.0
-        total = 0.0
-        print("-- old detection --")
-        for x in xs:
-            if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
-                continue
-            pred_gesture, fingers = finger.detect(x)
-            print(pred_gesture, correct_gesture)
-            if pred_gesture in correct_gesture:
+            if pred in correct_gesture:
                 correct += 1
 
             total += 1
 
-        print("Percent correct (new):", new_det_accuracy, "%")
-        print("Percent correct (old):", correct/total * 100, "%")
-        correctness.append((n, new_det_accuracy, correct/total * 100))
+        #print("Percent correct (new):", new_det_accuracy, "%")
+        #print("Percent correct (old):", correct/total * 100, "%")
+        #correctness.append((n, new_det_accuracy, correct/total * 100))
 
-    print(correctness)
+    correct = 0.0
+    total = 0.0
+    # print("-- old detection --")
+    for x in xs:
+        if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
+            continue
+        pred_gesture, fingers = finger.detect(x)
+        # print(pred_gesture, correct_gesture)
+        if pred_gesture in correct_gesture:
+            correct += 1
+
+        total += 1
+
+    #print("Percent correct (new new):", new_new_det_accuracy, "%")
+    #print("Percent correct (new):", new_det_accuracy, "%")
+    #print("Percent correct (old):", correct/total * 100, "%")

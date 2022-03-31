@@ -1,28 +1,48 @@
-# given ten readings of ten sensors, detect what gesture is happening
-# all inputs are given as tuples
-#
-# rotating best cases:
-# x x x x input1 x x x x x
-# x x x x input2 x x x x x
-# where input1 and input2 are less than x
-# rotate left: input1[0] < input2[0]
-# rotate right: input1[0] > input2[0]
-#
-# zooming best cases:
-# x inputa2 x x x x x inputb2 x x
-# x x x x inputa1 inputb1 x x x x
-# where inputa1, inputa2, inputb1, and inputb2 are less than x
-# zoom in: inputa2[0] < inputa1[0] && inputa2[1] < inputa1[1] && inputb1[0] < inputb2[0] && inputb1[1] < inputb2[1]
-#
-# x inputa1 x x x x x inputb1 x x
-# x x x x inputa2 inputb2 x x x x
-# where inputa1, inputa2, inputb1, and inputb2 are less than x
-# zoom out: inputa1[0] < inputa2[0] && inputa1[1] < inputa2[1] && inputb2[0] < inputb1[0] && inputb2[1] < inputb1[1]
-#
-
 import numpy as np
 import math
 import finger
+
+history = []
+
+
+def classify1(fingers, min_hist_len=3):
+    global history
+
+    if len(fingers) == 0:
+        history = []
+        return "none"
+
+    if len(history) < min_hist_len:
+        history += [fingers]
+        return "none"
+
+    prev_fingers = history[-min_hist_len:]
+    history += [fingers]
+
+    num_swipes = 0
+    num_pinches = 0
+    for prevs in prev_fingers:
+        if len(prevs) == 1:
+            num_swipes += 1
+        else:
+            num_pinches += 1
+
+    if len(fingers) == 1:
+        curr, prev = np.array(fingers[0]), np.array(prev_fingers[-1][0])
+
+        dx, dy = np.abs(curr - prev)
+        # if np.linalg.norm((dx,dy)) > 15:
+        #    print("delta too big!", curr, prev)
+        #    return "none"
+
+        if num_swipes > num_pinches:
+            return "swipe"
+        else:
+            return "pinch"
+    else:
+        return "pinch"
+
+    return "none"
 
 
 def classify(sensor_datas):

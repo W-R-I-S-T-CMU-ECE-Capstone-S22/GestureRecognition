@@ -1,14 +1,18 @@
 """
 """
+import time
+import pickle
 import numpy as np
 import scipy.signal
 import scipy.optimize
-import matplotlib.pyplot as plt
 
 from constants import *
 from sensor_data import SensorData
 
-EXTRA_LEN = 0
+
+EXTRA_LEN = 1
+
+clf = pickle.load(open(MODEL_NAME, "rb"))
 
 
 def remove_bad_data(sensor_data):
@@ -55,7 +59,7 @@ def fit(sensor_data):
     rmse = np.inf
     peaks_min = None
     peaks_max = None
-    if xdata.size > 3:
+    if xdata.size > 3 and xdata.size == ydata.size:
         # try to fit a 4th degree poly to data
         popt, residuals, rank, sing_vals, rcond = np.polyfit(
             xdata, ydata, 6, full=True)
@@ -74,8 +78,8 @@ def fit(sensor_data):
         # delete values at the "edges"; there cannot be a pinch at
         # the edges
         peaks_max = np.delete(peaks_max, np.where(
-            peaks_max >= fitted.size-EXTRA_LEN-1))
-        peaks_max = np.delete(peaks_max, np.where(peaks_max <= EXTRA_LEN+1))
+            peaks_max >= fitted.size-EXTRA_LEN-2))
+        peaks_max = np.delete(peaks_max, np.where(peaks_max <= EXTRA_LEN+2))
 
         # adjust indices to original sensor values
         peaks_min -= EXTRA_LEN
@@ -99,25 +103,27 @@ def detect(sensor_data):
         sensors = SensorData.get_sensors()
         f = quartic(sensors, *popt)
 
-        num_fingers = 0
         if len(peaks_max) == 0:
             possible_gesture = "swipe"
-            num_fingers = 1
+
+            if peaks_min.size == 1:
+                min_idx = f[peaks_min].argsort()[0]
+                idx = peaks_min[min_idx]
+            else:
+                idx = np.argmin(f)
+            fingers = [(f[idx], find_finger_y(idx, sensor_data))]
+
         elif len(peaks_max) == 1:
             possible_gesture = "pinch"
             num_fingers = 2
 
-        peakVerify = True
+            max_idx = peaks_max[0]
+            bottom, top = f[:max_idx], f[max_idx:]
 
-        for peakmin in peaks_min:
-            if peakmin >= len(f):
-                peakVerify = False
+            idx = np.argmin(bottom)
+            fingers += [(f[idx], find_finger_y(idx, sensor_data))]
 
-        if num_fingers != 0 and peaks_min.size >= num_fingers and peakVerify:
-            # find lowest num_fingers amount of min_peaks
-            min_idxs = f[peaks_min].argsort()[:num_fingers]
-            finger_idxs = peaks_min[min_idxs]
-            for idx in finger_idxs:
-                fingers += [(f[idx], find_finger_y(idx, sensor_data))]
+            idx = np.argmin(top) + bottom.size
+            fingers += [(f[idx], find_finger_y(idx, sensor_data))]
 
     return possible_gesture, fingers
