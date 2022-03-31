@@ -34,7 +34,7 @@ def on_message(client, userdata, msg):
         webapp_data["gesture"] = pred_gesture
         webapp_data["x_coord"] = [x for x,y in fingers]
         webapp_data["y_coord"] = [y for x,y in fingers]
-        webapp_data["timestamp"] = time.time()
+        webapp_data["timestamp"] = sensor_data.timestamp
         webapp_data = json.dumps(webapp_data)
 
         print(webapp_data)

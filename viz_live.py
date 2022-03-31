@@ -61,9 +61,9 @@ def animate(i):
         pred_gesture, fingers = finger.detect(x)
         gest = gesture.classify1(fingers)
 
-        print(clf.predict([x]))
+        label = clf.predict([x])[0]
 
-        title.set_text(f"Gesture={gest}")
+        title.set_text(f"Num fingers={label+1}")
 
         scat.set_offsets(np.array([x, y]).T)
 
@@ -75,7 +75,7 @@ def animate(i):
         webapp_data["gesture"] = gest
         webapp_data["x_coord"] = finger_xs
         webapp_data["y_coord"] = finger_ys
-        webapp_data["timestamp"] = time.time()
+        webapp_data["timestamp"] = sensor_data.timestamp
         webapp_data = json.dumps(webapp_data)
 
         client.publish(GESTURE_TOPIC, webapp_data)
