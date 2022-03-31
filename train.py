@@ -27,6 +27,8 @@ if __name__ == '__main__':
                     ys += [0]
                 elif "pinch" in filename:
                     ys += [1]
+                elif "noise" in filename:
+                    ys += [-1]
 
     datas = np.array(datas)
     ys = np.array(ys)
