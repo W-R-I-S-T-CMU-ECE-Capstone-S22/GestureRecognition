@@ -34,9 +34,9 @@ def find_finger_y(finger_idx, sensor_data):
             val = float(sensor_data[i])
             # weight is 1/(|xi - x| + 5)
             # kinda averaging it, but with a weighting
-            ws += [1.0 / (np.abs(val - center_val) + 5.0)]
+            ws += [1 / (np.abs(val - center_val) + 5)]
         else:
-            ws += [0.0]
+            ws += [1 / 5]
 
     ws = np.array(ws)
     finger_y = SENSOR_DIST * np.sum(ws * idxs) / np.sum(ws)
@@ -88,9 +88,6 @@ def fit(sensor_data):
         peaks_min = np.delete(peaks_min, np.where(peaks_min < 0))
         peaks_max = np.delete(peaks_max, np.where(peaks_max < 0))
 
-    # max of points instead of curve
-    # peaks_max = scipy.signal.argrelmax(sensor_data, order=4)[0]
-
     return popt, rmse, peaks_min, peaks_max
 
 
@@ -103,7 +100,9 @@ def detect(sensor_data):
         sensors = SensorData.get_sensors()
         f = quartic(sensors, *popt)
 
-        if len(peaks_max) == 0:
+        pred = clf.predict([sensor_data])[0]
+
+        if pred == 0:
             possible_gesture = "swipe"
 
             if peaks_min.size == 1:
@@ -113,17 +112,22 @@ def detect(sensor_data):
                 idx = np.argmin(f)
             fingers = [(f[idx], find_finger_y(idx, sensor_data))]
 
-        elif len(peaks_max) == 1:
+        elif pred == 1:
             possible_gesture = "pinch"
             num_fingers = 2
 
-            max_idx = peaks_max[0]
-            bottom, top = f[:max_idx], f[max_idx:]
+            if peaks_max.size == 1:
+                max_idx = peaks_max[0]
+                bottom, top = f[:max_idx], f[max_idx:]
 
-            idx = np.argmin(bottom)
-            fingers += [(f[idx], find_finger_y(idx, sensor_data))]
+                idx1 = np.argmin(bottom)
+                idx2 = np.argmin(top) + bottom.size
+            else:
+                idx1 = np.argmin(f)
+                idx2 = idx1
 
-            idx = np.argmin(top) + bottom.size
-            fingers += [(f[idx], find_finger_y(idx, sensor_data))]
+            fingers += [(f[idx1], find_finger_y(idx1, sensor_data))]
+            fingers += [(f[idx2], find_finger_y(idx2, sensor_data))]
+
 
     return possible_gesture, fingers

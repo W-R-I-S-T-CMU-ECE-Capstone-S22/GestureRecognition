@@ -59,3 +59,4 @@ def classify(sensor_datas):
         predictions.items(), key=lambda x: x[1], reverse=True)
     predicted_gesture = sort_predictions[0][0]
     return predicted_gesture
+
