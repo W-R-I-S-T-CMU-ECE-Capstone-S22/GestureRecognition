@@ -97,4 +97,3 @@ plt.show()
 plt.close("all")
 
 client.disconnect()
-

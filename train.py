@@ -11,7 +11,7 @@ from sensor_data import SensorData, SensorDatasFromFile
 from constants import *
 
 if __name__ == '__main__':
-    files = ["data/" + filename for filename in os.listdir("data") if filename != ".DS_Store"]
+    files = ["data/subsets/" + filename for filename in os.listdir("data/subsets") if filename != ".DS_Store"]
 
     datas = []
     ys = []
@@ -49,7 +49,7 @@ if __name__ == '__main__':
         print()
 
         clf = GridSearchCV(
-            SVC(), tuned_parameters, scoring='%s_macro' % score
+            SVC(), tuned_parameters, scoring='%s_macro' % score, verbose = 5
         )
         clf.fit(X_train, y_train)
 
@@ -75,6 +75,5 @@ if __name__ == '__main__':
         print(classification_report(y_true, y_pred))
         print()
 
-    with open(MODEL_NAME, 'wb') as file:
+    with open(MODEL_NAME_OTHER, 'wb') as file:
         pickle.dump(clf, file)
-

@@ -12,7 +12,7 @@ from sensor_data import SensorData
 
 EXTRA_LEN = 1
 
-clf = pickle.load(open(MODEL_NAME, "rb"))
+clf = pickle.load(open(MODEL_NAME_OTHER, "rb"))
 
 
 def remove_bad_data(sensor_data):
@@ -45,8 +45,8 @@ def find_finger_y(finger_idx, sensor_data):
 
 
 # 4th degree polynomial
-def quartic(x, a, b, c, d, e, f, g):
-    return a*x**6 + b*x**5 + c*x**4 + d*x**3 + e*x**2 + f*x**1 + g*x**0
+def quartic(x, a, b, c, d, e):
+    return a*x**4 + b*x**3 + c*x**2 + d*x**1 + e*x**0
 
 
 def fit(sensor_data):
@@ -62,7 +62,7 @@ def fit(sensor_data):
     if xdata.size > 3 and xdata.size == ydata.size:
         # try to fit a 4th degree poly to data
         popt, residuals, rank, sing_vals, rcond = np.polyfit(
-            xdata, ydata, 6, full=True)
+            xdata, ydata, 4, full=True)
         ypred = quartic(xdata, *popt)
         # find rms error
         rmse = np.sqrt(np.square(ydata - ypred).mean())

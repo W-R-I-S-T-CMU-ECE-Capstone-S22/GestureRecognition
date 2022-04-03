@@ -62,4 +62,3 @@ while (1):
         client.disconnect()
         time.sleep(0.1)
         break
-

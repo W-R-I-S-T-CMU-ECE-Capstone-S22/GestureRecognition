@@ -27,7 +27,7 @@ if __name__ == "__main__":
     mod_y = np.arange(-finger.EXTRA_LEN, NUM_SENSORS +
                       finger.EXTRA_LEN) * SENSOR_DIST
 
-    clf = pickle.load(open(MODEL_NAME, "rb"))
+    clf = pickle.load(open(MODEL_NAME_OTHER, "rb"))
     for x in xs:
         popt, rmse, peaks_min, peaks_max = finger.fit(x)
         gest, fingers = finger.detect(x)
