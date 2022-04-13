@@ -19,6 +19,7 @@ class SensorData:
         data = list(data)
         self.timestamp = int.from_bytes(bytes(data[:-NUM_SENSORS]), "little")
         self.raw = np.array(data[-NUM_SENSORS:])
+        self.raw[self.raw > DIST_THRES] = 255
 
     @classmethod
     def get_sensors(cls):
@@ -44,4 +45,6 @@ class SensorDatasFromFile:
 
             raw_str = data[timestamp_idx:].strip(", ").strip("[").strip("]")
             raw = np.fromstring(raw_str, dtype=np.uint8, sep=", ")
+            raw[raw > DIST_THRES] = 255
             self.raw += [raw]
+

@@ -10,7 +10,9 @@ import pickle
 import paho.mqtt.client as mqtt
 
 from sensor_data import SensorData, BatteryInfo
-import finger, gesture
+import finger
+import gesture
+import model
 
 from constants import *
 
@@ -58,10 +60,10 @@ def animate(i):
         if x.size != y.size:
             return scat, title, scat_fingers,
 
-        pred_gesture, fingers = finger.detect(x)
+        _, fingers = finger.detect(x)
         gest = gesture.classify1(fingers)
 
-        label = clf.predict([x])[0]
+        label = model.predict(x)
 
         title.set_text(f"Num fingers={label+1}")
 

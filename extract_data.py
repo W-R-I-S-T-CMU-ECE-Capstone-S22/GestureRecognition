@@ -12,7 +12,7 @@ from sensor_data import SensorData, SensorDatasFromFile
 import model
 
 if __name__ == '__main__':
-    files = ["data/pinch_in.txt"]
+    files = ["data/" + filename for filename in os.listdir("data") if filename != ".DS_Store"]
 
     datas = []
     ys = []
