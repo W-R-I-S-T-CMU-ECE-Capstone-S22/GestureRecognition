@@ -23,7 +23,7 @@ scat = axs.scatter([],[])
 title = axs.text(1.0, 1.0, "")
 scat_fingers = axs.scatter([],[])
 
-clf = pickle.load(open(MODEL_NAME, "rb"))
+clf = pickle.load(open(MODEL_NAME_OTHER, "rb"))
 
 datas = []
 

@@ -11,7 +11,7 @@ from sensor_data import SensorData, SensorDatasFromFile
 from constants import *
 
 if __name__ == '__main__':
-    files = ["data/subsets/" + filename for filename in os.listdir("data/subsets") if filename != ".DS_Store"]
+    files = ["data/" + filename for filename in os.listdir("data") if filename != ".DS_Store"]
 
     datas = []
     ys = []

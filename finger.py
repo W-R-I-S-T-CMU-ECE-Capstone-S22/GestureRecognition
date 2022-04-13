@@ -114,7 +114,6 @@ def detect(sensor_data):
 
         elif pred == 1:
             possible_gesture = "pinch"
-            num_fingers = 2
 
             if peaks_max.size == 1:
                 max_idx = peaks_max[0]
@@ -128,6 +127,9 @@ def detect(sensor_data):
 
             fingers += [(f[idx1], find_finger_y(idx1, sensor_data))]
             fingers += [(f[idx2], find_finger_y(idx2, sensor_data))]
+
+        elif pred == -1:
+            possible_gesture = "none"
 
 
     return possible_gesture, fingers
