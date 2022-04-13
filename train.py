@@ -2,16 +2,18 @@ import os
 import numpy as np
 import pickle
 
+from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 
 from sensor_data import SensorData, SensorDatasFromFile
-from constants import *
+import model
 
 if __name__ == '__main__':
-    files = ["data/subsets/" + filename for filename in os.listdir("data/subsets") if filename != ".DS_Store"]
+    files = ["arm_data/" + filename for filename in os.listdir("arm_data/") if filename != ".DS_Store" and not os.path.isdir("arm_data/"+filename)]
+    # files += ["new/noise.txt"]
 
     datas = []
     ys = []
@@ -19,7 +21,6 @@ if __name__ == '__main__':
         sensor_datas = SensorDatasFromFile(filename)
         xs = sensor_datas.raw
         for x in xs:
-            datas += [x]
             if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
                 ys += [-1]
             else:
@@ -30,6 +31,10 @@ if __name__ == '__main__':
                 elif "noise" in filename:
                     ys += [-1]
 
+            # x = preprocessing.scale(x)
+            #x = (x - np.mean(x)) / (np.std(x) + 0.1)
+            datas += [x]
+
     datas = np.array(datas)
     ys = np.array(ys)
     X, y = datas, ys
@@ -39,8 +44,8 @@ if __name__ == '__main__':
 
     # Set the parameters by cross-validation
     tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],
-                         'C': [10**i for i in range(-3, 4)]},
-                        {'kernel': ['linear'], 'C': [10**i for i in range(-3, 4)]}]
+                         'C': [1, 10, 100, 1000]},
+                        {'kernel': ['linear'], 'C': [1, 10, 100, 1000]}]
 
     scores = ['precision', 'recall']
 
@@ -49,7 +54,8 @@ if __name__ == '__main__':
         print()
 
         clf = GridSearchCV(
-            SVC(), tuned_parameters, scoring='%s_macro' % score, verbose = 5
+            SVC(), tuned_parameters, scoring='%s_macro' % score,
+            verbose=5
         )
         clf.fit(X_train, y_train)
 
@@ -75,5 +81,6 @@ if __name__ == '__main__':
         print(classification_report(y_true, y_pred))
         print()
 
-    with open(MODEL_NAME_OTHER, 'wb') as file:
+    with open(model.MODEL_NAME_ARM, 'wb') as file:
         pickle.dump(clf, file)
+
