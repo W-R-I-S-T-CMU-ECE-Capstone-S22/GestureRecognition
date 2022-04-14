@@ -8,7 +8,7 @@ MODEL_NAME_OTHER = "models/model_other.pkl"
 MODEL_NAME_SUBSETS = "models/model_subsets.pkl"
 MODEL_NAME_ARM = "models/arm_model.pkl"
 
-model_name = MODEL_NAME_NORMALIZED
+model_name = MODEL_NAME_OTHER
 clf = pickle.load(open(model_name, "rb"))
 
 def predict(sensor_data):
@@ -29,4 +29,3 @@ def pred2label(pred):
 
 def pred2num_fingers(pred):
     return pred + 1
-

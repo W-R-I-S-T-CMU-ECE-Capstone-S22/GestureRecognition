@@ -12,7 +12,8 @@ from sensor_data import SensorData, SensorDatasFromFile
 import model
 
 if __name__ == '__main__':
-    files = ["data/pinch_in.txt"]
+    files = ["arm_data/" + filename for filename in os.listdir("arm_data/") if filename != ".DS_Store" and not os.path.isdir("arm_data/"+filename)]
+    # files += ["new/noise.txt"]
 
     datas = []
     ys = []

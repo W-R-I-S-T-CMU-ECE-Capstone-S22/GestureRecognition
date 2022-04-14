@@ -27,10 +27,11 @@ if __name__ == "__main__":
     mod_y = np.arange(-finger.EXTRA_LEN, NUM_SENSORS +
                       finger.EXTRA_LEN) * SENSOR_DIST
 
+
     for x in xs:
         popt, rmse, peaks_min, peaks_max = finger.fit(x)
-        _, fingers = finger.detect(x)
-        gest = gesture.classify1(fingers)
+        gest, fingers = finger.detect(x)
+        gest = gesture.classify(fingers)
 
         # print('err:', rmse)
         if popt is not None and rmse < 15.0:
@@ -48,6 +49,8 @@ if __name__ == "__main__":
         for finger_x, finger_y in fingers:
             plt.plot(finger_x, finger_y, "<r")
             plt.text(finger_x, finger_y, "finger")
+
+        print(clf.predict([x]))
 
         plt.scatter(x, y)
         plt.title(f"Gesture={gest}")

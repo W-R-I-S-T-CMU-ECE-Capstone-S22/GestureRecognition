@@ -89,23 +89,25 @@ def fit(sensor_data):
 
 
 history = []
+
+
 def filter(sensor_data, num_fingers_pred):
     global history
 
-    history += [(sensor_data,num_fingers_pred)]
+    history += [(sensor_data, num_fingers_pred)]
     if len(history) <= 4:
         return None, 0
     else:
-        print([pred for _,pred in history])
+        print([pred for _, pred in history])
         prev_pred = None
         num_zero, num_one, num_two = 0, 0, 0
-        for _,pred in history:
+        for _, pred in history:
             if prev_pred is not None:
                 if prev_pred == pred:
                     if pred == 0:
                         num_zero += 1
                     if pred == 1:
-                       num_one += 1
+                        num_one += 1
                     if pred == 2:
                         num_two += 1
             prev_pred = pred
@@ -143,7 +145,6 @@ def detect(sensor_data):
 
         elif pred == 2:
             possible_gesture = "pinch"
-            num_fingers_pred = 2
 
             if peaks_max.size == 1:
                 max_idx = peaks_max[0]
@@ -159,3 +160,44 @@ def detect(sensor_data):
             fingers += [(f[idx2], find_finger_y(idx2, sensor_data))]
 
     return possible_gesture, fingers
+
+
+def detectFrequency(sensor_data):
+    num_fingers_pred = model.pred2num_fingers(model.predict(sensor_data))
+    sensor_data, pred = filter(sensor_data, num_fingers_pred)
+
+    if sensor_data is not None:
+        popt, rmse, peaks_min, peaks_max = fit(sensor_data)
+    else:
+        popt = None
+
+    fingers = []
+    if popt is not None and rmse < 15.0:
+        sensors = SensorData.get_sensors()
+        f = quartic(sensors, *popt)
+
+        if num_fingers_pred == 1:
+
+            if peaks_min.size == 1:
+                min_idx = f[peaks_min].argsort()[0]
+                idx = peaks_min[min_idx]
+            else:
+                idx = np.argmin(f)
+            fingers = [(f[idx], find_finger_y(idx, sensor_data))]
+
+        elif num_fingers_pred == 2:
+
+            if peaks_max.size == 1:
+                max_idx = peaks_max[0]
+                bottom, top = f[:max_idx], f[max_idx:]
+
+                idx1 = np.argmin(bottom)
+                idx2 = np.argmin(top) + bottom.size
+            else:
+                idx1 = np.argmin(f)
+                idx2 = idx1
+
+            fingers += [(f[idx1], find_finger_y(idx1, sensor_data))]
+            fingers += [(f[idx2], find_finger_y(idx2, sensor_data))]
+
+    return num_fingers_pred, fingers

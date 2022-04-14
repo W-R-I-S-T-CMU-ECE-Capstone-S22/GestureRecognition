@@ -27,7 +27,7 @@ if __name__ == "__main__":
     finger_locs = []
     for i,x in enumerate(xs):
         gest, fingers = finger.detect(x)
-        gest = gesture.classify1(fingers)
+        gest = gesture.classify(fingers)
         for f in fingers:
             plt.scatter(f[0], f[1])
             plt.text(f[0], f[1], f"t={i}")

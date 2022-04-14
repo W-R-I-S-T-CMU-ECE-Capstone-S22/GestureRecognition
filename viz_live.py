@@ -21,11 +21,9 @@ y = SensorData.get_sensors()
 
 fig = plt.figure()
 axs = plt.axes(xlim=(0, 275), ylim=(-SENSOR_DIST, (NUM_SENSORS+1)*SENSOR_DIST))
-scat = axs.scatter([],[])
+scat = axs.scatter([], [])
 title = axs.text(1.0, 1.0, "")
-scat_fingers = axs.scatter([],[])
-
-clf = pickle.load(open(MODEL_NAME_OTHER, "rb"))
+scat_fingers = axs.scatter([], [])
 
 datas = []
 
@@ -36,10 +34,12 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe(DATA_TOPIC)
         client.subscribe(BATT_TOPIC)
 
+
 def on_disconnect(client, userdata, rc):
     if rc == 0:
         print("Disconnected!")
         client.loop_stop()
+
 
 def on_message(client, userdata, msg):
     data = msg.payload
@@ -52,6 +52,7 @@ def on_message(client, userdata, msg):
 def init():
     return scat, title, scat_fingers
 
+
 def animate(i):
     if len(datas) > 0:
         sensor_data = datas.pop(0)
@@ -61,7 +62,12 @@ def animate(i):
             return scat, title, scat_fingers,
 
         _, fingers = finger.detect(x)
-        gest = gesture.classify1(fingers)
+        gest = gesture.classify(fingers)
+
+        num_fingers_pred, _ = finger.detectFrequency(x)
+        gest = gesture.classifyOnFrequency(num_fingers_pred)
+
+        print(gest)
 
         label = model.predict(x)
 
@@ -69,8 +75,8 @@ def animate(i):
 
         scat.set_offsets(np.array([x, y]).T)
 
-        finger_xs = [x for x,y in fingers]
-        finger_ys = [y for x,y in fingers]
+        finger_xs = [x for x, y in fingers]
+        finger_ys = [y for x, y in fingers]
         scat_fingers.set_offsets(np.array([finger_xs, finger_ys]).T)
 
         webapp_data = {}
@@ -84,7 +90,8 @@ def animate(i):
     return scat, title, scat_fingers,
 
 
-client = mqtt.Client("client" + str(random.randrange(100000, 999999)), clean_session=True)
+client = mqtt.Client(
+    "client" + str(random.randrange(100000, 999999)), clean_session=True)
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.on_message = on_message

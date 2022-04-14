@@ -26,12 +26,11 @@ if __name__ == "__main__":
     correct = 0.0
     total = 0.0
 
-
     # print("-- new new detection --")
     for x in xs:
         total += 1
         prediction, fingers = finger.detect(x)
-        pred = gesture.classify1(fingers)
+        pred = gesture.classify(fingers)
         if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
             if pred in "none":
                 correct += 1
@@ -43,14 +42,14 @@ if __name__ == "__main__":
     correct = 0.0
     total = 0.0
     multiple_data = []
-    n = 3
+    n = 4
     # print("-- new detection --")
     for x in xs:
         prediction, _ = finger.detect(x)
         # print("data prediction: ", prediction)
         multiple_data.append(x)
         if len(multiple_data) > n:
-            pred = gesture.classify(multiple_data)
+            pred, _ = gesture.findHighestFrequency(multiple_data)
             # print(pred)
             multiple_data = []
 
