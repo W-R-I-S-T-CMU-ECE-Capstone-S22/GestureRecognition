@@ -12,6 +12,7 @@ import numpy as np
 from sensor_data import SensorData, SensorDatasFromFile
 import finger
 import gesture
+import model
 
 from constants import *
 
@@ -27,11 +28,13 @@ if __name__ == "__main__":
     mod_y = np.arange(-finger.EXTRA_LEN, NUM_SENSORS +
                       finger.EXTRA_LEN) * SENSOR_DIST
 
-
     for x in xs:
         popt, rmse, peaks_min, peaks_max = finger.fit(x)
         gest, fingers = finger.detect(x)
         gest = gesture.classify(fingers)
+
+        num_fingers_pred, _ = finger.detectFrequency(x)
+        gest = gesture.classifyOnFrequency(num_fingers_pred)
 
         # print('err:', rmse)
         if popt is not None and rmse < 15.0:
@@ -50,7 +53,7 @@ if __name__ == "__main__":
             plt.plot(finger_x, finger_y, "<r")
             plt.text(finger_x, finger_y, "finger")
 
-        print(clf.predict([x]))
+        print(model.clf.predict([x]))
 
         plt.scatter(x, y)
         plt.title(f"Gesture={gest}")

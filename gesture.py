@@ -67,6 +67,8 @@ def classifyOnFrequency(predictedNumber):
     if predictionString.find('pppp') == 0:
         if predictionString[-1] == 's':
             return 'pinchIn'
+        elif predictionString == 'ppppp':
+            return 'pinch'
         else:
             return currentGesture
 
