@@ -64,7 +64,7 @@ def animate(i):
         _, fingers = finger.detect(x)
         gest = gesture.classify(fingers)
 
-        print(gest, sensor_data.timestamp)
+        print(gest, sensor_data.timestamp, time.time())
 
         label = model.pred2label(model.predict(x))
 
