@@ -64,14 +64,11 @@ def animate(i):
         _, fingers = finger.detect(x)
         gest = gesture.classify(fingers)
 
-        num_fingers_pred, _ = finger.detectFrequency(x)
-        gest = gesture.classifyOnFrequency(num_fingers_pred)
+        print(gest, sensor_data.timestamp)
 
-        print(gest)
+        label = model.pred2label(model.predict(x))
 
-        label = model.predict(x)
-
-        title.set_text(f"Num fingers={label+1}")
+        title.set_text(f"Gesture={label}")
 
         scat.set_offsets(np.array([x, y]).T)
 

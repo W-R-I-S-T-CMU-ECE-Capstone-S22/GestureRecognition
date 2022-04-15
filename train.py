@@ -26,12 +26,13 @@ if __name__ == '__main__':
             else:
                 if "swipe" in filename:
                     ys += [0]
-                elif "pinch" in filename:
-                    ys += [1]
+                #elif "pinch" in filename:
+                #    ys += [1]
                 elif "noise" in filename:
+                    continue
                     ys += [-1]
 
-            # x = preprocessing.scale(x)
+            x = preprocessing.scale(x)
             #x = (x - np.mean(x)) / (np.std(x) + 0.1)
             datas += [x]
 

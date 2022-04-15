@@ -2,6 +2,7 @@
 Wrapper for sensor data to be read from a file.
 """
 
+import time
 import numpy as np
 from constants import *
 
@@ -17,7 +18,7 @@ class BatteryInfo:
 class SensorData:
     def __init__(self, data):
         data = list(data)
-        self.timestamp = int.from_bytes(bytes(data[:-NUM_SENSORS]), "little")
+        self.timestamp = time.time() # int.from_bytes(bytes(data[:-NUM_SENSORS]), "little")
         self.raw = np.array(data[-NUM_SENSORS:])
         self.raw[self.raw > DIST_THRES] = 255
 
