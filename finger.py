@@ -87,8 +87,11 @@ def fit(sensor_data):
 
     return popt, rmse, peaks_min, peaks_max
 
+prev_finger = None
 
-def detect(sensor_data):
+def detect(sensor_data, alpha=0.7):
+    global prev_finger
+
     pred = model.pred2num_fingers(model.predict(sensor_data))
     popt, rmse, peaks_min, peaks_max = fit(sensor_data)
 
@@ -106,7 +109,13 @@ def detect(sensor_data):
                 idx = peaks_min[min_idx]
             else:
                 idx = np.argmin(f)
-            fingers = [(f[idx], find_finger_y(idx, sensor_data))]
+
+            finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
+            if prev_finger is not None:
+                finger = alpha * finger + (1 - alpha) * prev_finger
+            prev_finger = finger
+
+            fingers = [finger]
 
         # elif pred == 2:
             # possible_gesture = "pinch"

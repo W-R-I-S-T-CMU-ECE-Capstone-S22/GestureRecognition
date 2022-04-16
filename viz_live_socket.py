@@ -7,6 +7,8 @@ import time
 import json
 import random
 import pickle
+import socket
+import threading
 import paho.mqtt.client as mqtt
 
 from sensor_data import SensorData, BatteryInfo
@@ -27,31 +29,43 @@ scat_fingers = axs.scatter([], [])
 
 datas = []
 
+run = True
 
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
-        print("Connected!")
-        client.subscribe(DATA_TOPIC)
-        client.subscribe(BATT_TOPIC)
+HOST = "172.26.165.98"  # The Photons's hostname or IP address
+PORT = 23           # The port used by the Photon
 
+def get_data():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(2)
 
-def on_disconnect(client, userdata, rc):
-    if rc == 0:
-        print("Disconnected!")
-        client.loop_stop()
+    while True:
+        if not run:
+            break
+        try:
+            print("Connecting...")
+            s.connect((HOST, PORT))
+            print("Connected!")
+            while True:
+                if not run:
+                    break
+                try:
+                    data = s.recv(1 + NUM_SENSORS)
+                    sensor_data = SensorData(data)
+                    datas.append(sensor_data)
+                except:
+                    break
+            s.close()
+        except:
+            print("Connection lost! Retrying...")
+            time.sleep(1)
 
-
-def on_message(client, userdata, msg):
-    data = msg.payload
-    if msg.topic == DATA_TOPIC:
-        sensor_data = SensorData(data)
-
-        datas.append(sensor_data)
-
+    print("Data collection stopped!")
 
 def init():
-    return scat, title, scat_fingers
+    t = threading.Thread(target=get_data)
+    t.start()
 
+    return scat, title, scat_fingers
 
 def animate(i):
     if len(datas) > 0:
@@ -87,19 +101,32 @@ def animate(i):
     return scat, title, scat_fingers,
 
 
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Connected to MQTT!")
+        client.subscribe(DATA_TOPIC)
+        client.subscribe(BATT_TOPIC)
+
+
+def on_disconnect(client, userdata, rc):
+    if rc == 0:
+        print("Disconnected from MQTT!")
+        client.loop_stop()
+
 client = mqtt.Client(
     "client" + str(random.randrange(100000, 999999)), clean_session=True)
 client.on_connect = on_connect
 client.on_disconnect = on_disconnect
-client.on_message = on_message
+# client.on_message = on_message
 
 client.connect("mqtt.eclipseprojects.io", 1883, 60)
 
 client.loop_start()
 
-anim = FuncAnimation(fig, animate, init_func=init, interval=5, blit=True)
+anim = FuncAnimation(fig, animate, init_func=init, interval=16, blit=True)
 
 plt.show()
 plt.close("all")
 
+run = False
 client.disconnect()

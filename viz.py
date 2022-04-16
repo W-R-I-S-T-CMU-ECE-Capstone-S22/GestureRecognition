@@ -33,9 +33,6 @@ if __name__ == "__main__":
         gest, fingers = finger.detect(x)
         gest = gesture.classify(fingers)
 
-        num_fingers_pred, _ = finger.detectFrequency(x)
-        gest = gesture.classifyOnFrequency(num_fingers_pred)
-
         # print('err:', rmse)
         if popt is not None and rmse < 15.0:
             f = finger.quartic(mod_y, *popt)

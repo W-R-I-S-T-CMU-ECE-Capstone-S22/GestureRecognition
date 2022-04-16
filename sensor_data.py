@@ -18,7 +18,7 @@ class BatteryInfo:
 class SensorData:
     last_timestamp = time.time()
     prev_raw = 255 * np.ones(NUM_SENSORS)
-    alpha = 0.6
+    alpha = 1
 
     def __init__(self, data):
         data = list(data)
