@@ -20,7 +20,7 @@ if __name__ == '__main__':
         sensor_datas = SensorDatasFromFile(filename)
         xs = sensor_datas.raw
         for x in xs:
-            if np.count_nonzero(x == 255) > x.size - 1:
+            if np.count_nonzero(x == 255) > x.size - 2:
                 ys += [-1]
             else:
                 if "one" in filename:
@@ -30,7 +30,8 @@ if __name__ == '__main__':
                 elif "all" in filename:
                     ys += [2]
                 elif "noise" in filename:
-                    ys += [-1]
+                    continue
+                    # ys += [-1]
 
             x = preprocessing.scale(x)
             datas += [x]
