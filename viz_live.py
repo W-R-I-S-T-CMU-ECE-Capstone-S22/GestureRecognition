@@ -61,14 +61,11 @@ def animate(i):
         if x.size != y.size:
             return scat, title, scat_fingers,
 
-        _, fingers = finger.detect(x)
-        gest = gesture.classify(fingers)
+        gest, fingers = finger.detect(x)
 
         print(gest, sensor_data.timestamp, time.time())
 
-        label = model.pred2label(model.predict(x))
-
-        title.set_text(f"Gesture={label}")
+        title.set_text(f"Gesture={gest}")
 
         scat.set_offsets(np.array([x, y]).T)
 

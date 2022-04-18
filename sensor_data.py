@@ -16,22 +16,18 @@ class BatteryInfo:
 
 
 class SensorData:
-    last_timestamp = time.time()
-    prev_raw = 255 * np.ones(NUM_SENSORS)
-    alpha = 1
+    last_timestamp = None
 
     def __init__(self, data):
         data = list(data)
         if len(data) > 0:
+            if SensorData.last_timestamp is None:
+                SensorData.last_timestamp = time.time()
+
             self.timestamp = SensorData.last_timestamp + data[0] / 1000
             SensorData.last_timestamp = self.timestamp
             self.raw = np.array(data[-NUM_SENSORS:])
             self.raw[self.raw > DIST_THRES] = 255
-
-            if np.count_nonzero(SensorData.prev_raw == 255) <= 2.0/3.0 * NUM_SENSORS:
-                self.raw = SensorData.alpha * self.raw + \
-                           (1 - SensorData.alpha) * SensorData.prev_raw
-            SensorData.prev_raw = self.raw
         else:
             self.timestamp = SensorData.last_timestamp
             self.raw = 255 * np.ones(NUM_SENSORS)

@@ -87,23 +87,18 @@ def fit(sensor_data):
 
     return popt, rmse, peaks_min, peaks_max
 
-prev_finger = None
-
-def detect(sensor_data, alpha=0.7):
-    global prev_finger
-
+def detect(sensor_data):
     pred = model.pred2num_fingers(model.predict(sensor_data))
     popt, rmse, peaks_min, peaks_max = fit(sensor_data)
 
-    possible_gesture = "none"
+    pred_gesture = "none"
     fingers = []
     if popt is not None and rmse < 15.0:
         sensors = SensorData.get_sensors()
         f = quartic(sensors, *popt)
 
         if pred == 1:
-            possible_gesture = "swipe"
-
+            pred_gesture = "swipe"
             if peaks_min.size == 1:
                 min_idx = f[peaks_min].argsort()[0]
                 idx = peaks_min[min_idx]
@@ -111,27 +106,20 @@ def detect(sensor_data, alpha=0.7):
                 idx = np.argmin(f)
 
             finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
-            if prev_finger is not None:
-                finger = alpha * finger + (1 - alpha) * prev_finger
-            prev_finger = finger
-
             fingers = [finger]
 
-        # elif pred == 2:
-            # possible_gesture = "pinch"
+        elif pred == 2:
+            pred_gesture = "two"
+            idx = np.argmin(f)
+            finger = np.array((f[idx], np.mean(SensorData.get_sensors())))
+            fingers = [finger]
 
-            # if peaks_max.size == 1:
-                # max_idx = peaks_max[0]
-                # bottom, top = f[:max_idx], f[max_idx:]
+        # if pred == 3:
+            # pred_gesture = "all"
+            # f, _ = remove_bad_data(f)
+            # x = np.mean(f)
+            # y = np.mean(SensorData.get_sensors())
+            # fingers = [(x, y)]
 
-                # idx1 = np.argmin(bottom)
-                # idx2 = np.argmin(top) + bottom.size
-            # else:
-                # idx1 = np.argmin(f)
-                # idx2 = idx1
-
-            # fingers += [(f[idx1], find_finger_y(idx1, sensor_data))]
-            # fingers += [(f[idx2], find_finger_y(idx2, sensor_data))]
-
-    return possible_gesture, fingers
+    return pred_gesture, fingers
 

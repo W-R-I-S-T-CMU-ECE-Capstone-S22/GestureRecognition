@@ -14,7 +14,7 @@ def classify(fingers, min_hist_len=3):
     elif len(fingers) == 1:
         return "swipe"
     elif len(fingers) == 2:
-        return "pinch"
+        return "two"
 
 # create frequency table of number of fingers and finds highest frequency
 

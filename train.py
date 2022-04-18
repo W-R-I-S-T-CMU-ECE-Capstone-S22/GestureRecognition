@@ -12,8 +12,7 @@ from sensor_data import SensorData, SensorDatasFromFile
 import model
 
 if __name__ == '__main__':
-    files = ["arm_data/" + filename for filename in os.listdir("arm_data/") if filename != ".DS_Store" and not os.path.isdir("arm_data/"+filename)]
-    # files += ["new/noise.txt"]
+    files = ["data/" + filename for filename in os.listdir("data/") if filename != ".DS_Store" and not os.path.isdir("data/"+filename)]
 
     datas = []
     ys = []
@@ -24,16 +23,16 @@ if __name__ == '__main__':
             if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
                 ys += [-1]
             else:
-                if "swipe" in filename:
+                if "one" in filename:
                     ys += [0]
-                #elif "pinch" in filename:
-                #    ys += [1]
+                elif "two" in filename:
+                    ys += [1]
+                elif "all" in filename:
+                    ys += [2]
                 elif "noise" in filename:
-                    continue
                     ys += [-1]
 
             x = preprocessing.scale(x)
-            #x = (x - np.mean(x)) / (np.std(x) + 0.1)
             datas += [x]
 
     datas = np.array(datas)
@@ -82,5 +81,5 @@ if __name__ == '__main__':
         print(classification_report(y_true, y_pred))
         print()
 
-    with open(model.MODEL_NAME_ARM, 'wb') as file:
+    with open(model.MODEL_NAME, 'wb') as file:
         pickle.dump(clf, file)

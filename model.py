@@ -2,19 +2,14 @@ import pickle
 import numpy as np
 from sklearn import preprocessing
 
-MODEL_NAME = "models/model_old.pkl"
-MODEL_NAME_NORMALIZED = "models/model_normalized.pkl"
-MODEL_NAME_OTHER = "models/model_other.pkl"
-MODEL_NAME_SUBSETS = "models/model_subsets.pkl"
+MODEL_NAME = "models/model.pkl"
 MODEL_NAME_ARM = "models/arm_model.pkl"
 
-model_name = MODEL_NAME_ARM
+model_name = MODEL_NAME
 clf = pickle.load(open(model_name, "rb"))
 
 def predict(sensor_data):
-    if model_name == MODEL_NAME_NORMALIZED or model_name == MODEL_NAME_ARM:
-        sensor_data = preprocessing.scale(sensor_data)
-        # sensor_data = (sensor_data - np.mean(sensor_data)) / (np.std(sensor_data) + 0.1)
+    sensor_data = preprocessing.scale(sensor_data)
     return clf.predict([sensor_data])[0]
 
 def pred2label(pred):
@@ -22,6 +17,10 @@ def pred2label(pred):
         return "none"
     elif pred == 0:
         return "swipe"
+    elif pred == 1:
+        return "two"
+    elif pred == 2:
+        return "all"
     else:
         return "unknown"
 
