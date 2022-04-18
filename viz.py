@@ -61,5 +61,5 @@ if __name__ == "__main__":
         plt.gca().set_xlim(left=0, right=275)
         plt.show()
 
-        client.disconnect()
+    client.disconnect()
 
