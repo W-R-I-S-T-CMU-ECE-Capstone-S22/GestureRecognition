@@ -13,9 +13,9 @@ from sensor_data import SensorData
 EXTRA_LEN = 1
 
 
-# 4th degree polynomial
-def quartic(x, a, b, c, d, e):
-    return a*x**4 + b*x**3 + c*x**2 + d*x**1 + e*x**0
+# 2nd degree polynomial
+def quartic(x, a, b, c):
+    return a*x**2 + b*x + c
 
 
 def remove_bad_data(sensor_data):
@@ -29,9 +29,9 @@ def find_finger_y(finger_idx, sensor_data):
 
     center_val = float(sensor_data[finger_idx])
     ws = []
-    # grab the 4 indices surrounding the finger_idx:
-    # [finger_idx - 2, finger_idx - 1, finger_idx, finger_idx + 1, finger_idx + 2]
-    idxs = np.arange(-2, 3) + finger_idx
+    # grab the 2 indices surrounding the finger_idx:
+    # [finger_idx - 1, finger_idx, finger_idx + 1]
+    idxs = np.arange(-1, 2) + finger_idx
     for i in idxs:
         if 0 <= i < sensor_data.size:
             val = float(sensor_data[i])
@@ -59,7 +59,7 @@ def fit(sensor_data):
     if xdata.size > 3 and xdata.size == ydata.size:
         # try to fit a 4th degree poly to data
         popt, residuals, rank, sing_vals, rcond = np.polyfit(
-            xdata, ydata, 4, full=True)
+            xdata, ydata, 2, full=True)
         ypred = quartic(xdata, *popt)
         # find rms error
         rmse = np.sqrt(np.square(ydata - ypred).mean())
@@ -99,11 +99,11 @@ def detect(sensor_data):
 
         if pred == 1:
             pred_gesture = "swipe"
-            if peaks_min.size == 1:
-                min_idx = f[peaks_min].argsort()[0]
-                idx = peaks_min[min_idx]
-            else:
-                idx = np.argmin(f)
+            # if peaks_min.size == 1:
+                # min_idx = f[peaks_min].argsort()[0]
+                # idx = peaks_min[min_idx]
+            # else:
+            idx = np.argmin(f)
 
             finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
             fingers = [finger]

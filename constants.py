@@ -1,7 +1,7 @@
 NUM_SENSORS = 10
 
 SENSOR_DIST = 5.08
-DIST_THRES = 175.0
+DIST_THRES = 150.0
 
 DATA_TOPIC = "wrist/data/sensors"
 BATT_TOPIC = "wrist/batt/sensors"
