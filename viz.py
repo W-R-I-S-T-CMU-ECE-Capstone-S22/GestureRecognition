@@ -4,7 +4,9 @@ Visualizes sensor data and predicted finger position.
 Run code and continually press x on plots.
 """
 import sys
-import pickle
+import json
+import random
+import paho.mqtt.client as mqtt
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,34 +25,35 @@ if __name__ == "__main__":
 
     data = SensorDatasFromFile(sys.argv[1])
 
+    client = mqtt.Client(
+        "client" + str(random.randrange(100000, 999999)), clean_session=True)
+    client.connect("mqtt.eclipseprojects.io", 1883, 60)
+    client.loop_start()
+
     xs = data.raw
+    timestamps = data.timestamps
     y = SensorData.get_sensors()
     mod_y = np.arange(-finger.EXTRA_LEN, NUM_SENSORS +
                       finger.EXTRA_LEN) * SENSOR_DIST
 
-    for x in xs:
-        popt, rmse, peaks_min, peaks_max = finger.fit(x)
+    for i,x in enumerate(xs):
         gest, fingers = finger.detect(x)
-        gest = gesture.classify(fingers)
-
-        # print('err:', rmse)
-        if popt is not None and rmse < 15.0:
-            f = finger.quartic(mod_y, *popt)
-            plt.plot(f, mod_y, "orange")
-
-            for i in peaks_max:
-                plt.plot(f[i], i*SENSOR_DIST, "sg")
-                plt.text(f[i], i*SENSOR_DIST, "max")
-
-            for i in peaks_min:
-                plt.plot(f[i], i*SENSOR_DIST, "s", color="orange")
-                plt.text(f[i], i*SENSOR_DIST, "min")
 
         for finger_x, finger_y in fingers:
             plt.plot(finger_x, finger_y, "<r")
             plt.text(finger_x, finger_y, "finger")
 
-        print(model.clf.predict([x]))
+        finger_xs = [x for x, y in fingers]
+        finger_ys = [y for x, y in fingers]
+
+        webapp_data = {}
+        webapp_data["gesture"] = gest
+        webapp_data["x_coord"] = finger_xs
+        webapp_data["y_coord"] = finger_ys
+        webapp_data["timestamp"] = timestamps[i]
+        webapp_data = json.dumps(webapp_data)
+
+        client.publish(GESTURE_TOPIC, webapp_data)
 
         plt.scatter(x, y)
         plt.title(f"Gesture={gest}")
@@ -58,3 +61,5 @@ if __name__ == "__main__":
         plt.ylabel("sensors (mm)")
         plt.gca().set_xlim(left=0, right=275)
         plt.show()
+
+        client.disconnect()
