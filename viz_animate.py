@@ -26,7 +26,7 @@ title = axs.text(1.0, 1.0, "")
 scat_fingers = axs.scatter([], [])
 
 if len(sys.argv) <= 1:
-    print("usage: python3 vz_webapp.py <filepath of data>")
+    print("usage: python3 viz_animate.py <filepath of data>")
     sys.exit(-1)
 
 datas = SensorDatasFromFile(sys.argv[1])
@@ -72,6 +72,7 @@ def animate(i):
 client = mqtt.Client(
     "client" + str(random.randrange(100000, 999999)), clean_session=True)
 
+
 client.connect("mqtt.eclipseprojects.io", 1883, 60)
 
 client.loop_start()
@@ -83,3 +84,4 @@ plt.close("all")
 
 client.loop_stop()
 client.disconnect()
+
