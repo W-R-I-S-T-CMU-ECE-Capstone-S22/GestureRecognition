@@ -20,7 +20,7 @@ if __name__ == '__main__':
         sensor_datas = SensorDatasFromFile(filename)
         xs = sensor_datas.raw
         for x in xs:
-            if np.count_nonzero(x == 255) > 2.0/3.0 * x.size:
+            if np.count_nonzero(x == 255) > x.size - 1:
                 ys += [-1]
             else:
                 if "one" in filename:
