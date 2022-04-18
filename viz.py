@@ -13,7 +13,6 @@ import numpy as np
 
 from sensor_data import SensorData, SensorDatasFromFile
 import finger
-import gesture
 import model
 
 from constants import *
@@ -63,3 +62,4 @@ if __name__ == "__main__":
         plt.show()
 
         client.disconnect()
+

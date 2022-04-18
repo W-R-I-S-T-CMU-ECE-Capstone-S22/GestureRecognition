@@ -11,7 +11,6 @@ import paho.mqtt.client as mqtt
 
 from sensor_data import SensorData, BatteryInfo
 import finger
-import gesture
 import model
 
 from constants import *

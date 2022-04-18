@@ -111,7 +111,7 @@ def detect(sensor_data):
         elif pred == 2:
             pred_gesture = "two"
             idx = np.argmin(f)
-            finger = np.array((f[idx], np.mean(SensorData.get_sensors())))
+            finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
             fingers = [finger]
 
         # if pred == 3:
