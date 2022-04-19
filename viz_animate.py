@@ -70,10 +70,7 @@ def animate(i):
 
 client = mqtt.Client(
     "client" + str(random.randrange(100000, 999999)), clean_session=True)
-
-
 client.connect("mqtt.eclipseprojects.io", 1883, 60)
-
 client.loop_start()
 
 anim = FuncAnimation(fig, animate, init_func=init, interval=33, blit=True)

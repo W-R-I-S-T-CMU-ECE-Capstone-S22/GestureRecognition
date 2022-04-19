@@ -33,12 +33,10 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe(DATA_TOPIC)
         client.subscribe(BATT_TOPIC)
 
-
 def on_disconnect(client, userdata, rc):
     if rc == 0:
         print("Disconnected!")
         client.loop_stop()
-
 
 def on_message(client, userdata, msg):
     data = msg.payload
@@ -47,10 +45,8 @@ def on_message(client, userdata, msg):
 
         datas.append(sensor_data)
 
-
 def init():
     return scat, title, scat_fingers
-
 
 def animate(i):
     if len(datas) > 0:
@@ -82,7 +78,6 @@ def animate(i):
         client.publish(GESTURE_TOPIC, webapp_data)
     return scat, title, scat_fingers,
 
-
 client = mqtt.Client(
     "client" + str(random.randrange(100000, 999999)), clean_session=True)
 client.on_connect = on_connect
@@ -99,3 +94,4 @@ plt.show()
 plt.close("all")
 
 client.disconnect()
+

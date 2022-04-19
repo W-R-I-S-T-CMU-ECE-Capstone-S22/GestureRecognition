@@ -53,73 +53,58 @@ def fit(sensor_data):
     xdata = np.delete(sensors, rmved_idxs)
 
     popt = None
-    rmse = np.inf
-    peaks_min = None
-    peaks_max = None
+    # peaks_min = None
+    # peaks_max = None
     if xdata.size > 3 and xdata.size == ydata.size:
         # try to fit a 4th degree poly to data
-        popt, residuals, rank, sing_vals, rcond = np.polyfit(
-            xdata, ydata, 2, full=True)
+        popt = np.polyfit(xdata, ydata, 2, full=True)[0]
         ypred = quartic(xdata, *popt)
         # find rms error
-        rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
         # append extra predicted values beyond the 10 sensors in the front and back
         mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS +
                                 EXTRA_LEN) * SENSOR_DIST
         fitted = quartic(mod_sensors, *popt)
-        peaks_min = scipy.signal.argrelmin(fitted)[0]
-        peaks_max = scipy.signal.argrelmax(fitted)[0]
+        # peaks_min = scipy.signal.argrelmin(fitted)[0]
+        # peaks_max = scipy.signal.argrelmax(fitted)[0]
 
-        # delete values at the "edges"; there cannot be a pinch at
-        # the edges
-        peaks_max = np.delete(peaks_max, np.where(
-            peaks_max >= fitted.size-EXTRA_LEN-2))
-        peaks_max = np.delete(peaks_max, np.where(peaks_max <= EXTRA_LEN+2))
+        # # delete values at the "edges"; there cannot be a pinch at
+        # # the edges
+        # peaks_max = np.delete(peaks_max, np.where(
+            # peaks_max >= fitted.size-EXTRA_LEN-2))
+        # peaks_max = np.delete(peaks_max, np.where(peaks_max <= EXTRA_LEN+2))
 
-        # adjust indices to original sensor values
-        peaks_min -= EXTRA_LEN
-        peaks_max -= EXTRA_LEN
-        # remove negative indices
-        peaks_min = np.delete(peaks_min, np.where(peaks_min < 0))
-        peaks_max = np.delete(peaks_max, np.where(peaks_max < 0))
+        # # adjust indices to original sensor values
+        # peaks_min -= EXTRA_LEN
+        # peaks_max -= EXTRA_LEN
+        # # remove negative indices
+        # peaks_min = np.delete(peaks_min, np.where(peaks_min < 0))
+        # peaks_max = np.delete(peaks_max, np.where(peaks_max < 0))
 
-    return popt, rmse, peaks_min, peaks_max
+    return popt
 
 def detect(sensor_data):
     pred = model.pred2num_fingers(model.predict(sensor_data))
-    popt, rmse, peaks_min, peaks_max = fit(sensor_data)
+    popt = fit(sensor_data)
 
     pred_gesture = "none"
     fingers = []
-    if popt is not None and rmse < 15.0:
+    if popt is not None:
         sensors = SensorData.get_sensors()
         f = quartic(sensors, *popt)
 
         if pred == 1:
             pred_gesture = "swipe"
-            # if peaks_min.size == 1:
-                # min_idx = f[peaks_min].argsort()[0]
-                # idx = peaks_min[min_idx]
-            # else:
             idx = np.argmin(f)
-
             finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
             fingers = [finger]
 
         elif pred == 2:
             pred_gesture = "two"
             idx = np.argmin(f)
-            finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
+            finger = np.array((f[idx], 25)) # find_finger_y(idx, sensor_data)))
             fingers = [finger]
-
-        # if pred == 3:
-            # pred_gesture = "all"
-            # f, _ = remove_bad_data(f)
-            # x = np.mean(f)
-            # y = np.mean(SensorData.get_sensors())
-            # fingers = [(x, y)]
 
     return pred_gesture, fingers
 
