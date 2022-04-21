@@ -63,8 +63,7 @@ def fit(sensor_data):
 
         # find approximate fitted curve and fins rel min and rel max
         # append extra predicted values beyond the 10 sensors in the front and back
-        mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS +
-                                EXTRA_LEN) * SENSOR_DIST
+        mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS + EXTRA_LEN) * SENSOR_DIST
         fitted = quartic(mod_sensors, *popt)
         # peaks_min = scipy.signal.argrelmin(fitted)[0]
         # peaks_max = scipy.signal.argrelmax(fitted)[0]
@@ -103,7 +102,7 @@ def detect(sensor_data):
         elif pred == 2:
             pred_gesture = "two"
             idx = np.argmin(f)
-            finger = np.array((f[idx], 25)) # find_finger_y(idx, sensor_data)))
+            finger = np.array((f[idx], find_finger_y(idx, sensor_data)))
             fingers = [finger]
 
     return pred_gesture, fingers

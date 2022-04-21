@@ -14,6 +14,7 @@ import model
 if __name__ == '__main__':
     files = ["data/" + filename for filename in os.listdir("data/") if filename != ".DS_Store" and not os.path.isdir("data/"+filename)]
     # files += ["live_data/swipe_two_med0.txt", "live_data/swipe_two_slow0.txt", "live_data/swipe_repeated_two.txt"]
+    files += ["live_data/two_far.txt"]
 
     datas = []
     ys = []
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     X, y = datas, ys
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.5, random_state=0)
+        X, y, test_size=0.33, random_state=42)
 
     # Set the parameters by cross-validation
     tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],
