@@ -10,9 +10,6 @@ from constants import *
 from sensor_data import SensorData
 
 
-EXTRA_LEN = 1
-
-
 # 2nd degree polynomial
 def quartic(x, a, b, c):
     return a*x**2 + b*x + c
@@ -53,6 +50,7 @@ def fit(sensor_data):
     xdata = np.delete(sensors, rmved_idxs)
 
     popt = None
+    rmse = np.inf
     # peaks_min = None
     # peaks_max = None
     if xdata.size > 3 and xdata.size == ydata.size:
@@ -60,10 +58,11 @@ def fit(sensor_data):
         popt = np.polyfit(xdata, ydata, 2, full=True)[0]
         ypred = quartic(xdata, *popt)
         # find rms error
+        rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
         # append extra predicted values beyond the 10 sensors in the front and back
-        mod_sensors = np.arange(-EXTRA_LEN, NUM_SENSORS + EXTRA_LEN) * SENSOR_DIST
+        mod_sensors = np.arange(NUM_SENSORS) * SENSOR_DIST
         fitted = quartic(mod_sensors, *popt)
         # peaks_min = scipy.signal.argrelmin(fitted)[0]
         # peaks_max = scipy.signal.argrelmax(fitted)[0]
@@ -81,11 +80,11 @@ def fit(sensor_data):
         # peaks_min = np.delete(peaks_min, np.where(peaks_min < 0))
         # peaks_max = np.delete(peaks_max, np.where(peaks_max < 0))
 
-    return popt
+    return rmse, popt
 
 def detect(sensor_data):
     pred = model.pred2num_fingers(model.predict(sensor_data))
-    popt = fit(sensor_data)
+    rmse, popt = fit(sensor_data)
 
     pred_gesture = "none"
     fingers = []

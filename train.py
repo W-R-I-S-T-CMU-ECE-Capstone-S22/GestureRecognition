@@ -14,7 +14,7 @@ import model
 if __name__ == '__main__':
     files = ["data/" + filename for filename in os.listdir("data/") if filename != ".DS_Store" and not os.path.isdir("data/"+filename)]
     # files += ["live_data/swipe_two_med0.txt", "live_data/swipe_two_slow0.txt", "live_data/swipe_repeated_two.txt"]
-    files += ["live_data/two_far.txt"]
+    files += ["live_data/two_far.txt", "live_data/swipe_careless0.txt"]
 
     datas = []
     ys = []
@@ -26,7 +26,7 @@ if __name__ == '__main__':
                 continue
                 # ys += [-1]
             else:
-                if "one" in filename:
+                if "one" in filename or "swipe" in filename:
                     ys += [0]
                 elif "two" in filename:
                     ys += [1]

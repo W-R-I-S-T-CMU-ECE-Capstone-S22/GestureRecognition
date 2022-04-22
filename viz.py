@@ -32,8 +32,6 @@ if __name__ == "__main__":
     xs = data.raw
     timestamps = data.timestamps
     y = SensorData.get_sensors()
-    mod_y = np.arange(-finger.EXTRA_LEN, NUM_SENSORS +
-                      finger.EXTRA_LEN) * SENSOR_DIST
 
     for i,x in enumerate(xs):
         gest, fingers = finger.detect(x)

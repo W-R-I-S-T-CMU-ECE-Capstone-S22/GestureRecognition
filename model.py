@@ -19,8 +19,6 @@ def pred2label(pred):
         return "swipe"
     elif pred == 1:
         return "two"
-    elif pred == 2:
-        return "all"
     else:
         return "unknown"
 
