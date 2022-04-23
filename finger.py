@@ -11,7 +11,7 @@ from sensor_data import SensorData
 
 
 # 2nd degree polynomial
-def quartic(x, a, b, c):
+def quad(x, a, b, c):
     return a*x**2 + b*x + c
 
 
@@ -34,9 +34,9 @@ def find_finger_y(finger_idx, sensor_data):
             val = float(sensor_data[i])
             # weight is 1/(|xi - x| + 5)
             # averaging it, but with a weighting
-            ws += [1 / (np.abs(val - center_val) + 5)]
+            ws += [1 / (np.abs(val - center_val) + 3)]
         else:
-            ws += [1 / 5]
+            ws += [1 / 3]
 
     ws = np.array(ws)
     finger_y = SENSOR_DIST * np.sum(ws * idxs) / np.sum(ws)
@@ -56,14 +56,14 @@ def fit(sensor_data):
     if xdata.size > 3 and xdata.size == ydata.size:
         # try to fit a 4th degree poly to data
         popt = np.polyfit(xdata, ydata, 2, full=True)[0]
-        ypred = quartic(xdata, *popt)
+        ypred = quad(xdata, *popt)
         # find rms error
         rmse = np.sqrt(np.square(ydata - ypred).mean())
 
         # find approximate fitted curve and fins rel min and rel max
         # append extra predicted values beyond the 10 sensors in the front and back
         mod_sensors = np.arange(NUM_SENSORS) * SENSOR_DIST
-        fitted = quartic(mod_sensors, *popt)
+        fitted = quad(mod_sensors, *popt)
         # peaks_min = scipy.signal.argrelmin(fitted)[0]
         # peaks_max = scipy.signal.argrelmax(fitted)[0]
 
@@ -90,7 +90,7 @@ def detect(sensor_data):
     fingers = []
     if popt is not None:
         sensors = SensorData.get_sensors()
-        f = quartic(sensors, *popt)
+        f = quad(sensors, *popt)
 
         if pred == 1:
             pred_gesture = "swipe"

@@ -24,3 +24,4 @@ def pred2label(pred):
 
 def pred2num_fingers(pred):
     return pred + 1
+
