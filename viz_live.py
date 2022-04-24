@@ -58,15 +58,14 @@ def animate(i):
 
         gest, fingers = finger.detect(x)
 
-        print(gest, sensor_data.timestamp, time.time())
-
         title.set_text(f"Gesture={gest}")
 
         scat.set_offsets(np.array([x, y]).T)
 
-        finger_xs = [x for x, y in fingers]
-        finger_ys = [y for x, y in fingers]
+        finger_xs = [float("{0:.2f}".format(x)) for x, y in fingers]
+        finger_ys = [float("{0:.2f}".format(y)) for x, y in fingers]
         scat_fingers.set_offsets(np.array([finger_xs, finger_ys]).T)
+        print(gest, sensor_data.timestamp, time.time(), finger_xs, finger_ys)
 
         webapp_data = {}
         webapp_data["gesture"] = gest
@@ -88,7 +87,7 @@ client.connect("mqtt.eclipseprojects.io", 1883, 60)
 
 client.loop_start()
 
-anim = FuncAnimation(fig, animate, init_func=init, interval=5, blit=True)
+anim = FuncAnimation(fig, animate, init_func=init, interval=10, blit=True)
 
 plt.show()
 plt.close("all")

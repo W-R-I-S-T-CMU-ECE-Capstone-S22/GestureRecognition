@@ -32,12 +32,15 @@ def on_message(client, userdata, msg):
 
         webapp_data = {}
         webapp_data["gesture"] = pred_gesture
-        webapp_data["x_coord"] = [x for x,y in fingers]
-        webapp_data["y_coord"] = [y for x,y in fingers]
+
+        finger_xs = [float("{0:.2f}".format(x)) for x, y in fingers]
+        finger_ys = [float("{0:.2f}".format(y)) for x, y in fingers]
+        webapp_data["x_coord"] = finger_xs
+        webapp_data["y_coord"] = finger_ys
         webapp_data["timestamp"] = sensor_data.timestamp
+        # webapp_data["sent"] = time.time()
         webapp_data = json.dumps(webapp_data)
 
-        print(webapp_data)
         client.publish(GESTURE_TOPIC, webapp_data)
 
     elif msg.topic == BATT_TOPIC:
@@ -57,7 +60,7 @@ client.loop_start()
 while (1):
     try:
         time.sleep(10)
-        client.publish(BATT_TOPIC_ASK, 0)
+        # client.publish(BATT_TOPIC_ASK, 0)
     except KeyboardInterrupt:
         client.disconnect()
         time.sleep(0.1)
