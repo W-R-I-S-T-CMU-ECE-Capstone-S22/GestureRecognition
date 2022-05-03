@@ -83,7 +83,7 @@ client.on_connect = on_connect
 client.on_disconnect = on_disconnect
 client.on_message = on_message
 
-client.connect("mqtt.eclipseprojects.io", 1883, 60)
+client.connect("172.26.52.57", 1883, 60)
 
 client.loop_start()
 
