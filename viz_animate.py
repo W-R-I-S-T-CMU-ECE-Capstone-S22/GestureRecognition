@@ -6,6 +6,7 @@ import sys
 import time
 import json
 import random
+import struct
 import pickle
 import paho.mqtt.client as mqtt
 
@@ -65,6 +66,8 @@ def animate(i):
         webapp_data = json.dumps(webapp_data)
 
         client.publish(GESTURE_TOPIC, webapp_data)
+        client.publish(DATA_TOPIC,
+                       struct.pack('%sb' % sensor_data.size, *(sensor_data.astype(np.int8))))
     return scat, title, scat_fingers,
 
 

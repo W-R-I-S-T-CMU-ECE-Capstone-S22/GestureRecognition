@@ -6,6 +6,7 @@ Run code and continually press x on plots.
 import sys
 import json
 import random
+import struct
 import paho.mqtt.client as mqtt
 
 import matplotlib.pyplot as plt
@@ -51,6 +52,9 @@ if __name__ == "__main__":
         webapp_data = json.dumps(webapp_data)
 
         client.publish(GESTURE_TOPIC, webapp_data)
+        client.publish(DATA_TOPIC,
+                       struct.pack('%sb' % x.size, *(x.astype(np.int8))))
+
 
         plt.scatter(x, y)
         plt.title(f"Gesture={gest}")
