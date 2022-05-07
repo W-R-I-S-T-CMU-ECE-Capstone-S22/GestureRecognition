@@ -45,7 +45,7 @@ def on_message(client, userdata, msg):
 
     elif msg.topic == BATT_TOPIC:
         batt = BatteryInfo(data)
-        print("voltage:", batt.voltage, "| battery (%):", batt.percentage)
+        # print("voltage:", batt.voltage, "| battery (%):", batt.percentage)
 
 
 client = mqtt.Client("client" + str(random.randrange(100000, 999999)), clean_session=True)
